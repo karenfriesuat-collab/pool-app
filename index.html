@@ -9,33 +9,32 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #F4F1EA; --surface: #FBF9F4; --border: #E2DDD0;
+    --bg: #F4F1EA; --surface: #FBFAF5; --border: #E2DDD0;
     --teal: #1B5E6B; --teal-light: #DCEEF0;
-    --text: #33302A; --muted: #8A8275; --label: #5C574D;
-    --good-bg: #EAF4EE; --good-border: #9FCDB0; --good-text: #2C5F40;
-    --warn-bg: #FBF1E0; --warn-border: #E8C290; --warn-text: #9A5B12;
-    --urgent-bg: #FBE9E7; --urgent-border: #E8A99E; --urgent-text: #8C3527;
-    --info-bg: #EAF1FB; --info-border: #A9C5E8; --info-text: #2A4E7C;
-    --action-bg: #F3EEF8; --action-border: #C9B8E0; --action-text: #5B3F85;
+    --text: #2E2B24; --muted: #8A8275; --label: #5C574D;
+    --good-bg: #EBF5EF; --good-border: #9FCDB0; --good-text: #266040;
+    --warn-bg: #FBF1E0; --warn-border: #E8C290; --warn-text: #8C5010;
+    --urgent-bg: #FBE9E7; --urgent-border: #E8A99E; --urgent-text: #852E22;
+    --info-bg: #EAF1FB; --info-border: #A9C5E8; --info-text: #264E7C;
+    --action-bg: #F3EEF8; --action-border: #C9B8E0; --action-text: #5A3E84;
     --dot-ok: #7FB894; --dot-ok-b: #5F9D78;
     --dot-low: #E8B95C; --dot-low-b: #D4A33E;
     --dot-out: #D9776A; --dot-out-b: #C25E50;
   }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; max-width: 480px; margin: 0 auto; padding-bottom: 40px; }
+  body { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; max-width: 480px; margin: 0 auto; padding-bottom: 40px; }
 
   /* HEADER */
   header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px 16px 12px; }
   .header-top { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
-  .logo { width: 40px; height: 40px; border-radius: 10px; background: var(--teal-light); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
-  h1 { font-size: 20px; font-weight: 700; color: var(--teal); font-family: Georgia, serif; }
+  .logo { width: 40px; height: 40px; border-radius: 10px; background: var(--teal); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  h1 { font-size: 20px; font-weight: 700; color: var(--teal); font-family: Georgia, serif; letter-spacing: -0.3px; }
   .subtitle { font-size: 12px; color: var(--muted); margin-top: 1px; }
   .last-reading { font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; }
   .last-reading strong { font-weight: 600; }
 
-  /* CONTEXT */
-  .context-strip { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 12px; display: flex; gap: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-  .context-strip::-webkit-scrollbar { display: none; }
-  .ctx-btn { flex-shrink: 0; padding: 6px 14px; border-radius: 999px; border: 1.5px solid var(--border); background: transparent; color: var(--muted); font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  /* CONTEXT STRIP — no scroll, tight, ordered: maintenance/problem/event/opening/closing */
+  .context-strip { background: var(--surface); border-bottom: 1px solid var(--border); padding: 9px 12px; display: flex; flex-wrap: wrap; gap: 5px; }
+  .ctx-btn { padding: 6px 11px; border-radius: 999px; border: 1.5px solid var(--border); background: transparent; color: var(--label); font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; }
   .ctx-btn.active { background: var(--teal); border-color: var(--teal); color: #fff; }
 
   /* WEATHER */
@@ -64,7 +63,7 @@
   .field { display: flex; flex-direction: column; gap: 5px; }
   .field label { font-size: 12px; font-weight: 600; color: var(--label); }
   .field-range { font-weight: 400; color: #A8A095; font-size: 11px; }
-  input[type=number], input[type=text], textarea, select {
+  input[type=number], input[type=text], input[type=date], textarea, select {
     border: 1.5px solid var(--border); border-radius: 9px; padding: 10px 12px;
     font-size: 15px; background: #fff; color: var(--text); outline: none; font-family: inherit; width: 100%;
   }
@@ -74,8 +73,8 @@
   input.urgent { border-color: var(--urgent-border); background: var(--urgent-bg); }
   .save-btn { margin-top: 14px; width: 100%; background: var(--teal); color: #fff; border: none; border-radius: 10px; padding: 13px; font-size: 15px; font-weight: 700; cursor: pointer; }
   .save-btn:active { opacity: 0.85; }
+  .sec-btn { margin-top: 8px; width: 100%; background: transparent; color: var(--teal); border: 1.5px solid var(--teal); border-radius: 10px; padding: 11px; font-size: 14px; font-weight: 700; cursor: pointer; }
   .saved-flash { text-align: center; color: var(--good-text); font-weight: 600; font-size: 13px; margin-top: 8px; height: 18px; }
-  .sec-btn { margin-top: 10px; width: 100%; background: transparent; color: var(--teal); border: 1.5px solid var(--teal); border-radius: 10px; padding: 11px; font-size: 14px; font-weight: 700; cursor: pointer; }
 
   /* RECS */
   .rec-card { border: 1px solid; border-radius: 12px; padding: 12px 14px; font-size: 13.5px; line-height: 1.45; margin-bottom: 8px; }
@@ -101,7 +100,28 @@
   .atype-btn { padding: 10px 8px; border-radius: 10px; border: 1.5px solid var(--border); background: #fff; color: var(--label); font-size: 13px; font-weight: 600; cursor: pointer; text-align: center; }
   .atype-btn.selected { border-color: var(--teal); background: var(--teal-light); color: var(--teal); }
 
-  /* NEXT UP RULES */
+  /* NEXT UP — scheduled tasks */
+  .task-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-bottom: 10px; }
+  .task-card.urgent-card { border-color: var(--urgent-border); background: var(--urgent-bg); }
+  .task-card.warn-card { border-color: var(--warn-border); background: var(--warn-bg); }
+  .task-row { display: flex; align-items: flex-start; gap: 12px; }
+  .task-icon { font-size: 22px; flex-shrink: 0; line-height: 1; margin-top: 1px; }
+  .task-body { flex: 1; min-width: 0; }
+  .task-label { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+  .task-due { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+  .task-due.overdue { color: var(--urgent-text); }
+  .task-due.soon { color: var(--warn-text); }
+  .task-due.ok { color: var(--teal); }
+  .task-due.unknown { color: var(--muted); font-style: italic; }
+  .task-last { font-size: 11.5px; color: var(--muted); }
+  .task-weather { font-size: 12.5px; color: var(--urgent-text); font-weight: 700; margin-top: 4px; }
+  .task-note { font-size: 12px; color: var(--muted); margin-top: 3px; font-style: italic; }
+  .task-setdate-row { display: flex; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+  .task-setdate-row input { flex: 1; font-size: 14px; }
+  .task-setdate-save { padding: 8px 14px; border-radius: 8px; background: var(--teal); color: #fff; border: none; font-size: 13px; font-weight: 700; cursor: pointer; flex-shrink: 0; }
+  .btn-setdate { border: none; background: transparent; color: var(--muted); font-size: 11.5px; font-weight: 600; cursor: pointer; padding: 2px; }
+
+  /* OLD RULES — kept for compatibility */
   .rule-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; }
   .rule-card.triggered { border-color: var(--urgent-border); background: var(--urgent-bg); }
   .rule-header { display: flex; align-items: flex-start; gap: 10px; }
@@ -110,15 +130,8 @@
   .rule-body { flex: 1; }
   .rule-action { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
   .rule-triggers { font-size: 12px; color: var(--muted); line-height: 1.5; }
-  .rule-triggers span { display: inline-block; }
   .rule-lastdone { font-size: 11.5px; color: var(--good-text); margin-top: 4px; font-weight: 600; }
   .rule-triggered-msg { font-size: 12.5px; color: var(--urgent-text); font-weight: 700; margin-top: 4px; }
-  .add-rule-btn { width: 100%; margin-top: 8px; padding: 10px; border: 1.5px dashed var(--border); border-radius: 10px; background: transparent; color: var(--muted); font-size: 13px; font-weight: 600; cursor: pointer; }
-  .preset-section { margin-bottom: 14px; }
-  .preset-label { font-size: 11.5px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 7px; }
-  .preset-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-  .preset-chip { padding: 6px 12px; border-radius: 999px; border: 1.5px solid var(--teal); background: transparent; color: var(--teal); font-size: 12.5px; font-weight: 600; cursor: pointer; white-space: nowrap; }
-  .preset-chip:active { background: var(--teal-light); }
 
   /* INVENTORY */
   .inv-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); }
@@ -141,11 +154,27 @@
   select { appearance: none; }
   .inv-deduct-note { font-size: 12px; color: var(--good-text); margin-top: 4px; font-weight: 600; min-height: 16px; }
 
+  /* LOAD LAST READINGS */
+  .load-last-btn { width: 100%; margin-bottom: 12px; background: transparent; color: var(--label); border: 1.5px solid var(--border); border-radius: 10px; padding: 9px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .load-last-btn:active { background: var(--border); }
+
   @media (prefers-color-scheme: dark) {
-    :root { --bg: #1A1815; --surface: #242220; --border: #38342E; --text: #EDE9E0; --muted: #7A7570; --label: #B0A898; }
-    input[type=number], input[type=text], textarea, select, .inv-amount, .atype-btn { background: #2E2A26; color: var(--text); }
-    .modal { background: #242220; }
-    .chip.neutral { background: #2E2A26; }
+    :root {
+      --bg: #131210; --surface: #1D1B17; --border: #302C26;
+      --text: #F2EFE8; --muted: #9C9488; --label: #CCC4B4;
+      --good-bg: #0D1F13; --good-border: #1F4828; --good-text: #6EC48A;
+      --warn-bg: #201408; --warn-border: #442E10; --warn-text: #D4A450;
+      --urgent-bg: #1E0F0B; --urgent-border: #421E16; --urgent-text: #D46E5E;
+      --info-bg: #091522; --info-border: #183050; --info-text: #5E8ED0;
+      --action-bg: #12092A; --action-border: #2C1A50; --action-text: #8C70C0;
+      --teal-light: #0D2E34;
+      --dot-ok: #5F9D78; --dot-ok-b: #7FB894;
+      --dot-low: #C49040; --dot-low-b: #E8B95C;
+      --dot-out: #B85C50; --dot-out-b: #D9776A;
+    }
+    input[type=number], input[type=text], input[type=date], textarea, select, .inv-amount, .atype-btn { background: #242018; color: var(--text); border-color: var(--border); }
+    .modal { background: #1D1B17; }
+    .chip.neutral { background: #242018; border-color: var(--border); color: var(--muted); }
   }
 </style>
 </head>
@@ -153,7 +182,13 @@
 
 <header>
   <div class="header-top">
-    <div class="logo">🏊</div>
+    <div class="logo">
+      <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+        <path d="M3 22 Q8 15 14 22 Q20 29 25 22" stroke="white" stroke-width="2.8" stroke-linecap="round" fill="none"/>
+        <path d="M3 15 Q8 8 14 15 Q20 22 25 15" stroke="white" stroke-width="2.2" stroke-linecap="round" fill="none" opacity="0.7"/>
+        <path d="M6 9 Q10 5 14 9 Q18 13 22 9" stroke="white" stroke-width="1.8" stroke-linecap="round" fill="none" opacity="0.4"/>
+      </svg>
+    </div>
     <div>
       <h1>Pool Log</h1>
       <p class="subtitle">30′ round · vinyl liner · 25,000 gal · Mineral Frog</p>
@@ -166,11 +201,11 @@
 </header>
 
 <div class="context-strip">
-  <button class="ctx-btn active" data-ctx="maintenance">🔧 Maintenance</button>
-  <button class="ctx-btn" data-ctx="opening">🌱 Opening</button>
-  <button class="ctx-btn" data-ctx="closing">❄️ Closing</button>
-  <button class="ctx-btn" data-ctx="problem">⚠️ Problem</button>
-  <button class="ctx-btn" data-ctx="event">🎉 Event</button>
+  <button class="ctx-btn active" data-ctx="maintenance">Maintenance</button>
+  <button class="ctx-btn" data-ctx="problem">Problem</button>
+  <button class="ctx-btn" data-ctx="event">Event</button>
+  <button class="ctx-btn" data-ctx="opening">Opening</button>
+  <button class="ctx-btn" data-ctx="closing">Closing</button>
 </div>
 
 <div id="weather-bar">
@@ -205,46 +240,13 @@
 
 <main id="main"></main>
 
-<!-- LOG ACTION MODAL -->
-<div id="action-modal" class="modal-backdrop" style="display:none">
-  <div class="modal">
-    <h3>Log an Action</h3>
-    <label>What did you do?</label>
-    <div class="action-type-grid" id="atype-grid">
-      <button class="atype-btn selected" data-atype="Added chemical">⚗️ Added chemical</button>
-      <button class="atype-btn" data-atype="Shocked">⚡ Shocked</button>
-      <button class="atype-btn" data-atype="Cleaned filter">🔧 Cleaned filter</button>
-      <button class="atype-btn" data-atype="Backwashed">💧 Backwashed</button>
-      <button class="atype-btn" data-atype="Vacuumed">🌀 Vacuumed</button>
-      <button class="atype-btn" data-atype="Other">📝 Other</button>
-    </div>
-    <div id="chemical-fields">
-      <label>Chemical used (from inventory)</label>
-      <select id="action-chemical">
-        <option value="">— select or leave blank —</option>
-      </select>
-      <label>Amount used</label>
-      <div style="display:flex;gap:8px;align-items:center">
-        <input type="text" id="action-amount" placeholder="e.g. 2 lbs, 1 qt" style="flex:1" />
-      </div>
-      <div class="inv-deduct-note" id="deduct-note"></div>
-    </div>
-    <label>Notes (optional)</label>
-    <textarea id="action-notes" placeholder="Any additional details…"></textarea>
-    <div class="modal-btns">
-      <button class="btn-cancel" id="action-cancel">Cancel</button>
-      <button class="btn-save" id="action-save">Save Action</button>
-    </div>
-  </div>
-</div>
-
-<!-- RULE MODAL -->
+<!-- RULE MODAL (custom rules) -->
 <div id="rule-modal" class="modal-backdrop" style="display:none">
   <div class="modal">
-    <h3>Add Rule</h3>
+    <h3>Add Custom Rule</h3>
     <label>Action to watch for</label>
     <input type="text" id="rule-action" placeholder="e.g. Shock the pool" />
-    <p style="font-size:12px;color:var(--muted);margin-top:6px">Set one or more triggers. The rule fires when ANY condition is met.</p>
+    <p style="font-size:12px;color:var(--muted);margin-top:6px">Rule fires when ANY condition is met.</p>
     <label>📅 By this date</label>
     <input type="date" id="rule-date" />
     <label>💧 If chlorine drops below (ppm)</label>
@@ -260,9 +262,72 @@
   </div>
 </div>
 
+<!-- SET DATE MODAL -->
+<div id="setdate-modal" class="modal-backdrop" style="display:none">
+  <div class="modal">
+    <h3 id="setdate-modal-title">Set last done date</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Seeds the schedule from your history. The app will learn automatically from new logged actions.</p>
+    <label>Date last completed</label>
+    <input type="date" id="setdate-modal-input" />
+    <div class="modal-btns">
+      <button class="btn-cancel" id="setdate-cancel">Cancel</button>
+      <button class="btn-save" id="setdate-save">Save</button>
+    </div>
+  </div>
+</div>
+
 <script>
+// ── SCHEDULED TASKS ──────────────────────────────────────────────────────────
+// Defines recurring maintenance items with frequencies and match logic.
+// lastDone is auto-detected from state.log, or can be seeded via "Set date".
+const TASKS = [
+  {
+    id: 'shock',
+    label: 'Shock the pool',
+    icon: '⚡',
+    freq: 7,
+    match: e => e.type === 'action' && (e.actionType === 'Shocked' || e.actionType === 'Shock'),
+    weatherAlert: w => w && (w.rain24h >= 1 || w.hotRun >= 3),
+    weatherMsg: w => w && w.rain24h >= 1
+      ? `${w.rain24h}" rain today — shock tonight regardless of schedule`
+      : `${w.hotRun} consecutive 90°F+ days — shock before heatwave hits`,
+    note: 'Shock at sunset. ~2 lbs for 25k gal.',
+  },
+  {
+    id: 'filter',
+    label: 'Clean filter',
+    icon: '🔧',
+    freq: 14,
+    match: e => e.type === 'action' && e.actionType === 'Filter cleaned',
+    note: null,
+  },
+  {
+    id: 'pumpfilter',
+    label: 'Clean pump filter',
+    icon: '💧',
+    freq: 14,
+    match: e => e.type === 'action' && e.actionType === 'Pump filter cleaned',
+    note: null,
+  },
+  {
+    id: 'frog',
+    label: 'Replace Frog chlorine',
+    icon: '🐸',
+    freq: 30,
+    match: e => e.type === 'action' && e.actionType === 'Frog chlorine',
+    note: 'Check mineral level indicator.',
+  },
+  {
+    id: 'vacuum',
+    label: 'Vacuum pool',
+    icon: '🌀',
+    freq: 7,
+    match: e => e.type === 'action' && e.actionType === 'Vacuumed',
+    note: null,
+  },
+];
+
 // ── CONSTANTS ──────────────────────────────────────────────────────────────
-// Mineral Frog system: lower chlorine targets (minerals do the heavy lifting)
 const TARGETS = {
   chlorine:   { min: 0.5, max: 1.5, label: 'Chlorine',   unit: 'ppm' },
   ph:         { min: 7.4, max: 7.6, label: 'pH',         unit: '' },
@@ -279,14 +344,6 @@ const CTX_INFO = {
   problem:     { bg:'var(--urgent-bg)', border:'var(--urgent-border)', text:'var(--urgent-text)', msg:'Problem mode. Log current readings — recommendations will guide you. Green water: check chlorine + CYA first. Cloudy: check pH + alkalinity. With Mineral Frog, also check if cartridge needs replacing.' },
   event:       { bg:'var(--warn-bg)',   border:'var(--warn-border)',   text:'var(--warn-text)',   msg:'Event prep. Aim for chlorine 1–1.5 ppm 24h before. Shock 2 nights before if needed. Chlorine should be ≤1.5 ppm before swimming. With heavy swimmer load, retest after the event.' },
 };
-
-const PRESET_RULES = [
-  { action:'Shock the pool', ifChlorine:0.5, ifRain:0.5, repeatDays:7, label:'Shock (chlorine < 0.5 or rain > 0.5")' },
-  { action:'Test water chemistry', repeatDays:7, label:'Test weekly' },
-  { action:'Check Mineral Frog cartridge', repeatDays:30, label:'Check Mineral Frog (monthly)' },
-  { action:'Clean filter', repeatDays:14, label:'Clean filter (biweekly)' },
-  { action:'Backwash filter', repeatDays:30, label:'Backwash filter (monthly)' },
-];
 
 const DEFAULT_INVENTORY = [
   { name:'In The Swim Shock 24',      amount:'4',   unit:'lbs', status:'low' },
@@ -312,24 +369,23 @@ const API = '/api/log';
 let state = {
   ctx: 'maintenance', tab: 'log',
   reading: { chlorine:'', ph:'', alkalinity:'', cya:'', hardness:'', visibility:'', notes:'' },
-  log: [],        // combined: { type:'test'|'action', ...fields, timestamp, ctx }
+  log: [],
   inventory: [],
   rules: [],
   weather: null,
   actionType: 'Added chemical',
   syncing: false,
+  setdateTaskId: null,  // which task is having its date set
 };
 
 async function load() {
-  // Inventory + rules always from localStorage
   try { state.inventory = JSON.parse(localStorage.getItem('pool:inventory')) || DEFAULT_INVENTORY.map(x=>({...x})); } catch(e) { state.inventory = DEFAULT_INVENTORY.map(x=>({...x})); }
   try { state.rules     = JSON.parse(localStorage.getItem('pool:rules'))     || []; } catch(e) { state.rules = []; }
   if (!state.inventory.length) state.inventory = DEFAULT_INVENTORY.map(x=>({...x}));
 
-  // Log: try Notion API first, fall back to localStorage cache
   try {
     const cached = JSON.parse(localStorage.getItem('pool:log:cache') || '[]');
-    if (cached.length) { state.log = cached; render(); } // show cached immediately
+    if (cached.length) { state.log = cached; render(); }
   } catch(e) {}
 
   try {
@@ -340,21 +396,17 @@ async function load() {
       render();
     }
   } catch(e) {
-    // Notion unavailable — stay on cached data
     console.warn('Notion API unavailable, using local cache');
   }
 }
 
-// Save inventory/rules locally; log entries go to Notion
 function save(key, data) { try { localStorage.setItem('pool:'+key, JSON.stringify(data)); } catch(e){} }
 
 async function saveLogEntry(entry) {
-  // Optimistic: add locally right away
   state.log.unshift(entry);
   state.log = state.log.slice(0, 500);
   localStorage.setItem('pool:log:cache', JSON.stringify(state.log));
   render();
-  // Sync to Notion in background
   try {
     const result = await fetch(API, {
       method: 'POST',
@@ -384,6 +436,10 @@ function fmtDate(iso) {
   return new Date(iso).toLocaleString('en-US', { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' });
 }
 
+function fmtShort(iso) {
+  return new Date(iso).toLocaleDateString('en-US', { month:'short', day:'numeric' });
+}
+
 function daysSince(iso) {
   return Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
 }
@@ -395,7 +451,6 @@ function getRecs(r, weather) {
   const alk = parseFloat(r.alkalinity);
   const cya = parseFloat(r.cya);
 
-  // Mineral Frog targets: 0.5–1.5 ppm chlorine
   if (!isNaN(cl)) {
     if (cl <= 0)         recs.push({ level:'urgent', text:'No chlorine detected — shock tonight at sunset (2 lbs for 25k gal). Do not wait. Never shock in morning; sunlight destroys it before it works.' });
     else if (cl < 0.5)   recs.push({ level:'urgent', text:`Chlorine critically low (${cl} ppm) — shock tonight at sunset. Mineral Frog systems need at least 0.5 ppm free chlorine to work effectively.` });
@@ -415,9 +470,9 @@ function getRecs(r, weather) {
     else if (cya > 50)   recs.push({ level:'info', text:'CYA high — hold off adding stabilizer. Partial water swap at next top-off.' });
   }
   if (weather) {
-    if (weather.rain24h >= 1)         recs.push({ level:'warn', text:`Heavy rain (${weather.rain24h}" in 24h) — retest chlorine and likely shock tonight.` });
-    else if (weather.rain24h >= 0.5)  recs.push({ level:'info', text:`Rain yesterday (${weather.rain24h}") — check chlorine, may need to shock.` });
-    if (weather.tempF >= 90)          recs.push({ level:'info', text:`Hot day (${weather.tempF}°F) — heat accelerates chlorine loss. Check again tonight.` });
+    if (weather.rain24h >= 1)        recs.push({ level:'warn', text:`Heavy rain (${weather.rain24h}" in 24h) — retest chlorine and likely shock tonight.` });
+    else if (weather.rain24h >= 0.5) recs.push({ level:'info', text:`Rain today (${weather.rain24h}") — check chlorine, may need to shock.` });
+    if (weather.tempF >= 90)         recs.push({ level:'info', text:`Hot day (${weather.tempF}°F) — heat accelerates chlorine loss. Check again tonight.` });
   }
   if (recs.length === 0 && Object.values(r).some(v => v !== '')) {
     recs.push({ level:'good', text:'All readings in range — no action needed. Mineral Frog is doing its job.' });
@@ -442,27 +497,12 @@ function deductInventory(idx, amountStr) {
   const item = state.inventory[idx];
   const used = parseFloat(amountStr);
   const cur = parseFloat(item.amount);
-  if (isNaN(used) || isNaN(cur)) return null; // can't deduct
+  if (isNaN(used) || isNaN(cur)) return null;
   const remaining = Math.max(0, Math.round((cur - used) * 10) / 10);
   item.amount = String(remaining);
   if (remaining <= 0) item.status = 'out';
   else if (remaining <= cur * 0.25) item.status = 'low';
   return remaining;
-}
-
-// Find last time an action matching a rule was logged
-function lastActionForRule(rule) {
-  const keyword = rule.action.toLowerCase();
-  const match = state.log.find(e => e.type === 'action' && e.actionType && (
-    e.actionType.toLowerCase().includes('shock') && keyword.includes('shock') ||
-    e.actionType.toLowerCase().includes('clean') && keyword.includes('clean') ||
-    e.actionType.toLowerCase().includes('backwash') && keyword.includes('backwash') ||
-    e.actionType.toLowerCase().includes('vacuum') && keyword.includes('vacuum') ||
-    e.actionType.toLowerCase().includes('test') && keyword.includes('test') ||
-    (e.actionType === 'Other' && e.notes && e.notes.toLowerCase().includes(keyword)) ||
-    (e.chemical && e.chemical.toLowerCase().includes(keyword))
-  ));
-  return match ? match.timestamp : null;
 }
 
 // ── WEATHER ──────────────────────────────────────────────────────────────────
@@ -473,19 +513,27 @@ async function fetchWeather() {
   navigator.geolocation.getCurrentPosition(async pos => {
     const { latitude: lat, longitude: lon } = pos.coords;
     try {
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,precipitation&daily=precipitation_sum&temperature_unit=fahrenheit&precipitation_unit=inch&forecast_days=2&timezone=auto`;
+      // Fetch current + 4-day daily max temps (for consecutive hot day detection)
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,precipitation&daily=temperature_2m_max,precipitation_sum&temperature_unit=fahrenheit&precipitation_unit=inch&forecast_days=4&timezone=auto`;
       const data = await fetch(url).then(r => r.json());
-      const tempF = Math.round(data.current.temperature_2m);
-      const rain24h = Math.round((data.daily.precipitation_sum[0] || 0) * 10) / 10;
-      state.weather = { tempF, rain24h };
+      const tempF   = Math.round(data.current.temperature_2m);
+      const rain24h = Math.round((data.daily.precipitation_sum?.[0] || 0) * 10) / 10;
+      // Count consecutive 90°F+ days starting from today
+      const dailyTemps = data.daily.temperature_2m_max || [];
+      let hotRun = 0;
+      for (const t of dailyTemps) { if (t >= 90) hotRun++; else break; }
+      state.weather = { tempF, rain24h, hotRun };
+
       document.getElementById('weather-inner').innerHTML = `
         <div style="display:flex;gap:5px;align-items:center"><span>🌡️</span><span class="weather-val">${tempF}°F</span></div>
         <div style="display:flex;gap:5px;align-items:center"><span>🌧️</span><span class="weather-val">${rain24h}" today</span></div>
+        ${hotRun >= 2 ? `<div style="display:flex;gap:5px;align-items:center"><span>☀️</span><span style="font-size:12px;color:var(--warn-text);font-weight:600">${hotRun}d 90°F+</span></div>` : ''}
       `;
       const alerts = [];
       if (rain24h >= 1)        alerts.push({ level:'warn', text:`⚠️ ${rain24h}" rain today — retest chlorine and likely shock tonight.` });
       else if (rain24h >= 0.5) alerts.push({ level:'info', text:`🌧️ ${rain24h}" rain today — check chlorine.` });
-      if (tempF >= 90)         alerts.push({ level:'info', text:`☀️ ${tempF}°F — heat burns chlorine faster. Check again tonight.` });
+      if (hotRun >= 3)         alerts.push({ level:'warn', text:`☀️ ${hotRun} consecutive 90°F+ days — shock now; heat burns chlorine fast.` });
+      else if (tempF >= 90)    alerts.push({ level:'info', text:`☀️ ${tempF}°F — heat burns chlorine faster. Check again tonight.` });
       document.getElementById('weather-alerts').innerHTML = alerts.map(a => `<div class="weather-alert" style="${REC_STYLES[a.level]}">${a.text}</div>`).join('');
       render();
     } catch(e) {
@@ -512,10 +560,11 @@ function render() {
   bindEvents();
 }
 
-// LOG TAB
+// TEST TAB — with "Load last readings" button
 function renderLog() {
   const ci = CTX_INFO[state.ctx];
   const recs = getRecs(state.reading, state.weather);
+  const hasLastTest = state.log.find(e => e.type === 'test');
   const fieldHtml = FIELDS.map(key => {
     const t = TARGETS[key];
     const s = getStatus(key, state.reading[key]);
@@ -528,6 +577,7 @@ function renderLog() {
     <div class="ctx-card" style="background:${ci.bg};border-color:${ci.border};color:${ci.text}">${ci.msg}</div>
     <div class="card">
       <div class="card-title">Test readings</div>
+      ${hasLastTest ? `<button class="load-last-btn" id="load-last-btn">↩ Load last readings</button>` : ''}
       <div class="grid">
         ${fieldHtml}
         <div class="field" style="grid-column:1/-1">
@@ -539,25 +589,25 @@ function renderLog() {
           <textarea data-field="notes" placeholder="Weather, debris, observations…">${state.reading.notes}</textarea>
         </div>
       </div>
-      <button class="save-btn" id="save-btn">💾 Save test</button>
+      <button class="save-btn" id="save-btn">Save test</button>
       <div class="saved-flash" id="saved-flash"></div>
     </div>
     ${recs.length ? `<div style="margin-top:14px"><div class="section-label">What to do</div>${recs.map(r=>`<div class="rec-card" style="${REC_STYLES[r.level]}">${r.text}</div>`).join('')}</div>` : ''}
   `;
 }
 
-// ADD ACTION TAB
+// ADD ACTION TAB — updated action types + inventory bug fix for Shocked
 function renderAddAction() {
   const invOptions = state.inventory.map((item, i) =>
     `<option value="${i}">${item.name} (${invDisplayAmount(item)})</option>`
   ).join('');
   const actionTypes = [
-    { type:'Added chemical', icon:'⚗️' },
-    { type:'Shocked',        icon:'⚡' },
-    { type:'Cleaned filter', icon:'🔧' },
-    { type:'Backwashed',     icon:'💧' },
-    { type:'Vacuumed',       icon:'🌀' },
-    { type:'Other',          icon:'📝' },
+    { type:'Added chemical',    icon:'⚗️' },
+    { type:'Shocked',           icon:'⚡' },
+    { type:'Filter cleaned',    icon:'🔧' },
+    { type:'Pump filter cleaned', icon:'💧' },
+    { type:'Vacuumed',          icon:'🌀' },
+    { type:'Frog chlorine',     icon:'🐸' },
   ];
   const showChem = state.actionType === 'Added chemical' || state.actionType === 'Shocked';
   return `
@@ -584,75 +634,112 @@ function renderAddAction() {
         <label>Notes (optional)</label>
         <textarea id="action-notes" placeholder="Any additional details…"></textarea>
       </div>
-      <button class="save-btn" id="save-action-btn">💾 Save action</button>
+      <button class="save-btn" id="save-action-btn">Save action</button>
       <div class="saved-flash" id="action-flash"></div>
     </div>
   `;
 }
 
-// NEXT UP TAB
+// NEXT UP TAB — scheduled tasks with real dates
 function renderNextUp() {
-  const lastCl = (state.log.find(e => e.type === 'test' && e.chlorine !== '')) ? parseFloat(state.log.find(e => e.type === 'test' && e.chlorine !== '').chlorine) : null;
-  const rain24h = state.weather ? state.weather.rain24h : 0;
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-  // Existing presets not already added
-  const existingActions = state.rules.map(r => r.action);
-  const availablePresets = PRESET_RULES.filter(p => !existingActions.includes(p.action));
-
-  const rulesHtml = state.rules.length ? state.rules.map((rule, i) => {
-    const triggers = [];
-    let triggered = false;
-    const lastDone = lastActionForRule(rule);
-
-    // Check repeat: if lastDone + repeatDays <= today, fire
-    if (rule.repeatDays && lastDone) {
-      const nextDue = new Date(new Date(lastDone).getTime() + rule.repeatDays * 86400000);
-      const nextDueStr = nextDue.toISOString().split('T')[0];
-      if (today >= nextDueStr) { triggers.push(`🔁 Repeat every ${rule.repeatDays}d (last done ${daysSince(lastDone)}d ago)`); triggered = true; }
-      else triggers.push(`🔁 Next due ${nextDue.toLocaleDateString('en-US',{month:'short',day:'numeric'})}`);
-    } else if (rule.repeatDays && !lastDone) {
-      triggers.push(`🔁 Every ${rule.repeatDays} days — not yet logged`);
+  const taskItems = TASKS.map(task => {
+    // Find last log entry matching this task type
+    const lastLogEntry = state.log.find(e => task.match(e));
+    // Also check manually-seeded date in localStorage
+    const manualDate = localStorage.getItem(`pool:task:${task.id}:lastdone`);
+    let lastDoneTs = null;
+    if (lastLogEntry) {
+      lastDoneTs = new Date(lastLogEntry.timestamp);
+    } else if (manualDate) {
+      lastDoneTs = new Date(manualDate);
     }
-    if (rule.byDate && today >= rule.byDate) { triggers.push(`📅 Due by ${rule.byDate}`); triggered = true; }
-    else if (rule.byDate) triggers.push(`📅 By ${rule.byDate}`);
-    if (rule.ifChlorine != null && !isNaN(lastCl) && lastCl <= rule.ifChlorine) { triggers.push(`💧 Cl ${lastCl} ppm ≤ ${rule.ifChlorine}`); triggered = true; }
-    else if (rule.ifChlorine != null) triggers.push(`💧 If Cl ≤ ${rule.ifChlorine} ppm`);
-    if (rule.ifRain != null && rain24h >= rule.ifRain) { triggers.push(`🌧️ Rain ${rain24h}" ≥ ${rule.ifRain}"`); triggered = true; }
-    else if (rule.ifRain != null) triggers.push(`🌧️ If rain ≥ ${rule.ifRain}"`);
 
-    return `<div class="rule-card ${triggered ? 'triggered' : ''}">
-      <div class="rule-header">
-        <div class="rule-dot ${triggered ? 'triggered' : ''}"></div>
-        <div class="rule-body">
-          <div class="rule-action">${rule.action}</div>
-          <div class="rule-triggers">${triggers.join(' · ')}</div>
-          ${lastDone ? `<div class="rule-lastdone">✓ Last done ${daysSince(lastDone) === 0 ? 'today' : daysSince(lastDone) + 'd ago'}</div>` : ''}
-          ${triggered ? `<div class="rule-triggered-msg">⚡ Action needed</div>` : ''}
+    let nextDue = null, daysUntil = null;
+    if (lastDoneTs) {
+      const ld = new Date(lastDoneTs);
+      ld.setHours(0, 0, 0, 0);
+      nextDue = new Date(ld.getTime() + task.freq * 86400000);
+      daysUntil = Math.round((nextDue.getTime() - today.getTime()) / 86400000);
+    }
+
+    const weatherTrig = task.weatherAlert ? task.weatherAlert(state.weather) : false;
+    const overdue = daysUntil !== null && daysUntil <= 0;
+    const soonDue = daysUntil !== null && daysUntil > 0 && daysUntil <= 3;
+    const seeded = !!manualDate && !lastLogEntry;
+
+    return { ...task, lastDoneTs, nextDue, daysUntil, overdue, soonDue, weatherTrig, seeded };
+  });
+
+  // Sort: weather-triggered first, then overdue, then by daysUntil ASC, then unknown
+  taskItems.sort((a, b) => {
+    if (b.weatherTrig && !a.weatherTrig) return 1;
+    if (a.weatherTrig && !b.weatherTrig) return -1;
+    if (b.overdue && !a.overdue) return 1;
+    if (a.overdue && !b.overdue) return -1;
+    if (a.daysUntil === null && b.daysUntil !== null) return 1;
+    if (b.daysUntil === null && a.daysUntil !== null) return -1;
+    return (a.daysUntil ?? 0) - (b.daysUntil ?? 0);
+  });
+
+  const cardsHtml = taskItems.map(task => {
+    const isUrgent = task.overdue || task.weatherTrig;
+    const cardClass = isUrgent ? 'task-card urgent-card' : task.soonDue ? 'task-card warn-card' : 'task-card';
+
+    let dueText = '', dueClass = 'ok';
+    if (task.nextDue) {
+      if (task.overdue) {
+        const daysLate = Math.abs(task.daysUntil);
+        dueText = `Overdue ${daysLate > 0 ? daysLate + 'd' : '— due today'}`;
+        dueClass = 'overdue';
+      } else if (task.daysUntil === 0) {
+        dueText = 'Due today';
+        dueClass = 'soon';
+      } else {
+        dueText = `Due ${fmtShort(task.nextDue.toISOString())} · ${task.daysUntil}d`;
+        dueClass = task.soonDue ? 'soon' : 'ok';
+      }
+    } else {
+      dueText = 'Never logged — tap \'Set date\' to seed from history';
+      dueClass = 'unknown';
+    }
+
+    const lastText = task.lastDoneTs
+      ? `Last: ${fmtShort(task.lastDoneTs.toISOString())} · ${daysSince(task.lastDoneTs.toISOString())}d ago${task.seeded ? ' (manual)' : ''}`
+      : '';
+
+    const weatherLine = task.weatherTrig && task.weatherMsg
+      ? `<div class="task-weather">⚡ ${task.weatherMsg(state.weather)}</div>`
+      : '';
+
+    const noteLine = task.note ? `<div class="task-note">${task.note}</div>` : '';
+
+    return `<div class="${cardClass}">
+      <div class="task-row">
+        <div class="task-icon">${task.icon}</div>
+        <div class="task-body">
+          <div class="task-label">${task.label}</div>
+          <div class="task-due ${dueClass}">${dueText}</div>
+          ${lastText ? `<div class="task-last">${lastText}</div>` : ''}
+          ${weatherLine}
+          ${noteLine}
         </div>
-        <button class="icon-btn" data-delete-rule="${i}">✕</button>
+        <button class="btn-setdate" data-setdate="${task.id}" title="Set last done date">📅</button>
       </div>
     </div>`;
-  }).join('') : `<p class="muted" style="margin-bottom:12px">No rules yet. Add one below or pick a preset.</p>`;
-
-  const presetsHtml = availablePresets.length ? `
-    <div class="preset-section">
-      <div class="preset-label">Quick add</div>
-      <div class="preset-chips">
-        ${availablePresets.map((p,i) => `<button class="preset-chip" data-preset="${i}">＋ ${p.label}</button>`).join('')}
-      </div>
-    </div>` : '';
+  }).join('');
 
   return `
-    ${rulesHtml}
-    ${presetsHtml}
-    <button class="add-rule-btn" id="add-rule-btn">＋ Add custom rule</button>
+    <p class="muted" style="margin-bottom:10px;font-size:12px">Tap 📅 to seed a task from your Notion history. Dates update automatically once you log new actions.</p>
+    ${cardsHtml}
   `;
 }
 
 // HISTORY TAB
 function renderHistory() {
-  if (!state.log.length) return `<p class="muted">Nothing logged yet. Start on the Log tab.</p>`;
+  if (!state.log.length) return `<p class="muted">Nothing logged yet. Start on the Test tab.</p>`;
   return state.log.map((entry, idx) => {
     const isAction = entry.type === 'action';
     if (isAction) {
@@ -711,13 +798,24 @@ function renderInventory() {
 
 // ── EVENTS ───────────────────────────────────────────────────────────────────
 function bindEvents() {
-  // Field inputs (live rec update)
+  // Field inputs
   document.querySelectorAll('[data-field]').forEach(el => {
     el.addEventListener('input', e => {
       state.reading[e.target.dataset.field] = e.target.value;
       if (FIELDS.includes(e.target.dataset.field)) e.target.className = getStatus(e.target.dataset.field, e.target.value) || '';
       if (state.tab === 'log') updateRecs();
     });
+  });
+
+  // Load last readings button
+  const loadLastBtn = document.getElementById('load-last-btn');
+  if (loadLastBtn) loadLastBtn.addEventListener('click', () => {
+    const lastTest = state.log.find(e => e.type === 'test');
+    if (!lastTest) return;
+    FIELDS.forEach(k => { state.reading[k] = lastTest[k] != null ? String(lastTest[k]) : ''; });
+    state.reading.visibility = lastTest.visibility || '';
+    // Don't carry over notes — user likely wants to add fresh notes
+    render();
   });
 
   // Save test
@@ -732,19 +830,33 @@ function bindEvents() {
     if (flash) { flash.textContent = 'Saved ✓'; setTimeout(() => flash.textContent = '', 1800); }
   });
 
-  // Add action tab — inline form events
+  // Add action tab — action type buttons
   document.querySelectorAll('#atype-grid .atype-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       state.actionType = btn.dataset.atype;
       document.querySelectorAll('#atype-grid .atype-btn').forEach(b => b.classList.toggle('selected', b === btn));
       const show = state.actionType === 'Added chemical' || state.actionType === 'Shocked';
-      document.getElementById('chemical-fields').style.display = show ? '' : 'none';
+      const chemFields = document.getElementById('chemical-fields');
+      if (chemFields) chemFields.style.display = show ? '' : 'none';
+
+      // BUG FIX: auto-select shock chemical when "Shocked" is picked
+      if (state.actionType === 'Shocked') {
+        const sel = document.getElementById('action-chemical');
+        if (sel) {
+          const shockIdx = state.inventory.findIndex(item =>
+            item.name.toLowerCase().includes('shock') || item.name.toLowerCase().includes('di-zap')
+          );
+          if (shockIdx >= 0) { sel.value = String(shockIdx); updateDeductNote(); }
+        }
+      }
     });
   });
+
   const actionChemSel = document.getElementById('action-chemical');
   const actionAmtInput = document.getElementById('action-amount');
   if (actionChemSel) actionChemSel.addEventListener('change', updateDeductNote);
   if (actionAmtInput) actionAmtInput.addEventListener('input', updateDeductNote);
+
   const saveActionBtn = document.getElementById('save-action-btn');
   if (saveActionBtn) saveActionBtn.addEventListener('click', async () => {
     const sel = document.getElementById('action-chemical');
@@ -755,7 +867,6 @@ function bindEvents() {
     if (invIdx !== null && amountUsed) deductInventory(invIdx, amountUsed);
     save('inventory', state.inventory);
     const entry = { type:'action', actionType: state.actionType, chemical, amountUsed, notes, ctx: state.ctx, timestamp: new Date().toISOString() };
-    // Reset form fields
     if (document.getElementById('action-notes')) document.getElementById('action-notes').value = '';
     if (document.getElementById('action-amount')) document.getElementById('action-amount').value = '';
     if (sel) sel.value = '';
@@ -765,11 +876,28 @@ function bindEvents() {
     if (flash) { flash.textContent = 'Saved ✓'; setTimeout(() => flash.textContent = '', 1800); }
   });
 
+  // Set date buttons (Next Up tab)
+  document.querySelectorAll('[data-setdate]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const taskId = btn.dataset.setdate;
+      const task = TASKS.find(t => t.id === taskId);
+      if (!task) return;
+      state.setdateTaskId = taskId;
+      document.getElementById('setdate-modal-title').textContent = `Last done: ${task.label}`;
+      // Pre-fill with existing seeded date or today
+      const existing = localStorage.getItem(`pool:task:${taskId}:lastdone`);
+      document.getElementById('setdate-modal-input').value = existing
+        ? new Date(existing).toISOString().split('T')[0]
+        : new Date().toISOString().split('T')[0];
+      document.getElementById('setdate-modal').style.display = 'flex';
+    });
+  });
+
   // Delete log entry
   document.querySelectorAll('[data-delete]').forEach(btn => {
     btn.addEventListener('click', () => {
       state.log.splice(parseInt(btn.dataset.delete), 1);
-      save('log', state.log);
+      localStorage.setItem('pool:log:cache', JSON.stringify(state.log));
       render();
     });
   });
@@ -797,7 +925,7 @@ function bindEvents() {
     });
   });
 
-  // Remove inventory
+  // Remove inventory item
   document.querySelectorAll('[data-remove-inv]').forEach(btn => {
     btn.addEventListener('click', () => {
       state.inventory.splice(parseInt(btn.dataset.removeInv), 1);
@@ -806,7 +934,7 @@ function bindEvents() {
     });
   });
 
-  // Add inventory
+  // Add inventory item
   const addInvBtn = document.getElementById('add-inv-btn');
   if (addInvBtn) addInvBtn.addEventListener('click', () => {
     const name = document.getElementById('new-item-name').value.trim();
@@ -817,35 +945,24 @@ function bindEvents() {
     save('inventory', state.inventory);
     render();
   });
+}
 
-  // Preset rules
-  document.querySelectorAll('[data-preset]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const existingActions = state.rules.map(r => r.action);
-      const availablePresets = PRESET_RULES.filter(p => !existingActions.includes(p.action));
-      const preset = availablePresets[parseInt(btn.dataset.preset)];
-      if (!preset) return;
-      state.rules.push({ action: preset.action, byDate: null, ifChlorine: preset.ifChlorine || null, ifRain: preset.ifRain || null, repeatDays: preset.repeatDays || null });
-      save('rules', state.rules);
-      render();
-    });
-  });
-
-  // Add custom rule
-  const addRuleBtn = document.getElementById('add-rule-btn');
-  if (addRuleBtn) addRuleBtn.addEventListener('click', () => {
-    ['rule-action','rule-date','rule-chlorine','rule-rain','rule-repeat'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('rule-modal').style.display = 'flex';
-  });
-
-  // Delete rule
-  document.querySelectorAll('[data-delete-rule]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      state.rules.splice(parseInt(btn.dataset.deleteRule), 1);
-      save('rules', state.rules);
-      render();
-    });
-  });
+function updateDeductNote() {
+  const sel = document.getElementById('action-chemical');
+  const amtEl = document.getElementById('action-amount');
+  const note = document.getElementById('deduct-note');
+  if (!sel || !amtEl || !note) return;
+  const amt = amtEl.value.trim();
+  if (!sel.value || !amt) { note.textContent = ''; return; }
+  const item = state.inventory[parseInt(sel.value)];
+  const used = parseFloat(amt);
+  const cur = parseFloat(item.amount);
+  if (!isNaN(used) && !isNaN(cur)) {
+    const remaining = Math.max(0, Math.round((cur - used) * 10) / 10);
+    note.textContent = `Will deduct: ${cur} → ${remaining} ${item.unit}`;
+  } else {
+    note.textContent = 'Non-numeric amount — inventory won\'t auto-deduct.';
+  }
 }
 
 function updateRecs() {
@@ -857,79 +974,6 @@ function updateRecs() {
     div.innerHTML = `<div class="section-label">What to do</div>${recs.map(r=>`<div class="rec-card" style="${REC_STYLES[r.level]}">${r.text}</div>`).join('')}`;
     document.getElementById('main').appendChild(div);
   }
-}
-
-// ── ACTION MODAL ──────────────────────────────────────────────────────────────
-function openActionModal() {
-  state.actionType = 'Added chemical';
-  document.querySelectorAll('.atype-btn').forEach(b => b.classList.toggle('selected', b.dataset.atype === state.actionType));
-  document.getElementById('action-notes').value = '';
-  document.getElementById('action-amount').value = '';
-  document.getElementById('deduct-note').textContent = '';
-  // Populate inventory dropdown
-  const sel = document.getElementById('action-chemical');
-  sel.innerHTML = '<option value="">— select or leave blank —</option>' +
-    state.inventory.map((item, i) => `<option value="${i}">${item.name} (${invDisplayAmount(item)})</option>`).join('');
-  const chemFields = document.getElementById('chemical-fields');
-  chemFields.style.display = state.actionType === 'Added chemical' || state.actionType === 'Shocked' ? '' : 'none';
-  document.getElementById('action-modal').style.display = 'flex';
-  bindActionModal();
-}
-
-function bindActionModal() {
-  document.querySelectorAll('.atype-btn').forEach(btn => {
-    btn.onclick = () => {
-      state.actionType = btn.dataset.atype;
-      document.querySelectorAll('.atype-btn').forEach(b => b.classList.toggle('selected', b === btn));
-      const show = state.actionType === 'Added chemical' || state.actionType === 'Shocked';
-      document.getElementById('chemical-fields').style.display = show ? '' : 'none';
-    };
-  });
-
-  document.getElementById('action-chemical').onchange = updateDeductNote;
-  document.getElementById('action-amount').oninput = updateDeductNote;
-
-  document.getElementById('action-cancel').onclick = () => document.getElementById('action-modal').style.display = 'none';
-  document.getElementById('action-save').onclick = saveAction;
-}
-
-function updateDeductNote() {
-  const sel = document.getElementById('action-chemical');
-  const amt = document.getElementById('action-amount').value.trim();
-  const note = document.getElementById('deduct-note');
-  if (!sel.value || !amt) { note.textContent = ''; return; }
-  const item = state.inventory[parseInt(sel.value)];
-  const used = parseFloat(amt);
-  const cur = parseFloat(item.amount);
-  if (!isNaN(used) && !isNaN(cur)) {
-    const remaining = Math.max(0, Math.round((cur - used) * 10) / 10);
-    note.textContent = `Will deduct from inventory: ${cur} → ${remaining} ${item.unit}`;
-  } else {
-    note.textContent = 'Amount not numeric — inventory won\'t auto-deduct.';
-  }
-}
-
-function saveAction() {
-  const actionType = state.actionType;
-  const sel = document.getElementById('action-chemical');
-  const amountUsed = document.getElementById('action-amount').value.trim();
-  const notes = document.getElementById('action-notes').value.trim();
-  const invIdx = sel.value !== '' ? parseInt(sel.value) : null;
-  const chemical = invIdx !== null ? state.inventory[invIdx].name : '';
-
-  // Deduct from inventory
-  if (invIdx !== null && amountUsed) deductInventory(invIdx, amountUsed);
-
-  state.log.unshift({ type:'action', actionType, chemical, amountUsed, notes, ctx: state.ctx, timestamp: new Date().toISOString() });
-  state.log = state.log.slice(0, 500);
-  save('log', state.log);
-  save('inventory', state.inventory);
-
-  document.getElementById('action-modal').style.display = 'none';
-  // Flash confirmation
-  state.tab = 'history';
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === 'history'));
-  render();
 }
 
 // ── TABS & CONTEXT ────────────────────────────────────────────────────────────
@@ -967,6 +1011,20 @@ document.getElementById('rule-save').addEventListener('click', () => {
   document.getElementById('rule-modal').style.display = 'none';
   state.tab = 'nextup';
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === 'nextup'));
+  render();
+});
+
+// ── SET DATE MODAL ────────────────────────────────────────────────────────────
+document.getElementById('setdate-cancel').addEventListener('click', () => {
+  document.getElementById('setdate-modal').style.display = 'none';
+  state.setdateTaskId = null;
+});
+document.getElementById('setdate-save').addEventListener('click', () => {
+  const dateVal = document.getElementById('setdate-modal-input').value;
+  if (!dateVal || !state.setdateTaskId) return;
+  localStorage.setItem(`pool:task:${state.setdateTaskId}:lastdone`, new Date(dateVal).toISOString());
+  document.getElementById('setdate-modal').style.display = 'none';
+  state.setdateTaskId = null;
   render();
 });
 
