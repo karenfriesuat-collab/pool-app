@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<title>Pool Log</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #F4F1EA;
+    --surface: #FBF9F4;
+    --border: #E2DDD0;
+    --teal: #1B5E6B;
+    --teal-light: #DCEEF0;
+    --text: #33302A;
+    --muted: #8A8275;
+    --label: #5C574D;
+    --good-bg: #EAF4EE; --good-border: #9FCDB0; --good-text: #2C5F40;
+    --warn-bg: #FBF1E0; --warn-border: #E8C290; --warn-text: #9A5B12;
+    --urgent-bg: #FBE9E7; --urgent-border: #E8A99E; --urgent-text: #8C3527;
+    --info-bg: #EAF1FB; --info-border: #A9C5E8; --info-text: #2A4E7C;
+    --dot-ok: #7FB894; --dot-ok-b: #5F9D78;
+    --dot-low: #E8B95C; --dot-low-b: #D4A33E;
+    --dot-out: #D9776A; --dot-out-b: #C25E50;
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; max-width: 480px; margin: 0 auto; padding-bottom: 40px; }
+
+  /* HEADER */
+  header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px 16px 12px; }
+  .header-top { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .logo { width: 40px; height: 40px; border-radius: 10px; background: var(--teal-light); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  h1 { font-size: 20px; font-weight: 700; color: var(--teal); font-family: Georgia, serif; }
+  .subtitle { font-size: 12px; color: var(--muted); margin-top: 1px; }
+  .last-reading { font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; }
+  .last-reading strong { font-weight: 600; }
+
+  /* CONTEXT PICKER */
+  .context-strip { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 12px; display: flex; gap: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .context-strip::-webkit-scrollbar { display: none; }
+  .ctx-btn { flex-shrink: 0; padding: 6px 14px; border-radius: 999px; border: 1.5px solid var(--border); background: transparent; color: var(--muted); font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+  .ctx-btn.active { background: var(--teal); border-color: var(--teal); color: #fff; }
+
+  /* WEATHER BAR */
+  #weather-bar { margin: 12px 12px 0; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); padding: 10px 14px; font-size: 13px; color: var(--label); display: none; }
+  #weather-bar.visible { display: block; }
+  .weather-inner { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+  .weather-stat { display: flex; align-items: center; gap: 5px; }
+  .weather-label { color: var(--muted); font-size: 11.5px; }
+  .weather-val { font-weight: 700; }
+  #weather-alerts { margin-top: 8px; }
+  .weather-alert { font-size: 13px; line-height: 1.4; padding: 8px 10px; border-radius: 8px; margin-bottom: 6px; border: 1px solid; }
+
+  /* TABS */
+  nav { display: flex; gap: 4px; padding: 10px 12px 0; }
+  .tab-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px; padding: 9px 6px; border-radius: 10px; border: 1px solid transparent; background: transparent; color: var(--muted); font-size: 13px; font-weight: 600; cursor: pointer; }
+  .tab-btn.active { background: var(--surface); color: var(--teal); border-color: var(--border); }
+  .tab-btn svg { width: 15px; height: 15px; }
+
+  /* MAIN */
+  main { padding: 12px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+  .card-title { font-size: 15px; font-weight: 700; margin-bottom: 12px; }
+  .section-label { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 8px; }
+
+  /* CONTEXT INFO CARD */
+  .ctx-card { border-radius: 12px; padding: 12px 14px; border: 1px solid; font-size: 13.5px; line-height: 1.5; margin-bottom: 12px; }
+
+  /* LOG FORM */
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 12px; font-weight: 600; color: var(--label); }
+  .field-range { font-weight: 400; color: #A8A095; font-size: 11px; }
+  input[type=number], input[type=text], textarea, select {
+    border: 1.5px solid var(--border); border-radius: 9px; padding: 10px 12px;
+    font-size: 15px; background: #fff; color: var(--text); outline: none;
+    font-family: inherit; width: 100%;
+  }
+  textarea { min-height: 60px; resize: vertical; }
+  input.good { border-color: var(--good-border); background: var(--good-bg); }
+  input.warn { border-color: var(--warn-border); background: var(--warn-bg); }
+  input.urgent { border-color: var(--urgent-border); background: var(--urgent-bg); }
+  .save-btn { margin-top: 14px; width: 100%; background: var(--teal); color: #fff; border: none; border-radius: 10px; padding: 13px; font-size: 15px; font-weight: 700; cursor: pointer; }
+  .save-btn:active { opacity: 0.85; }
+  .saved-flash { text-align: center; color: var(--good-text); font-weight: 600; font-size: 13px; margin-top: 8px; height: 18px; }
+
+  /* RECS */
+  .rec-card { border: 1px solid; border-radius: 12px; padding: 12px 14px; font-size: 13.5px; line-height: 1.45; margin-bottom: 8px; }
+
+  /* HISTORY */
+  .history-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; }
+  .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .history-time { font-size: 12px; font-weight: 700; color: var(--label); }
+  .chips { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; }
+  .chip { border: 1px solid; border-radius: 999px; padding: 3px 9px; font-size: 11.5px; font-weight: 600; }
+  .chip.good { background: var(--good-bg); border-color: var(--good-border); color: var(--good-text); }
+  .chip.warn { background: var(--warn-bg); border-color: var(--warn-border); color: var(--warn-text); }
+  .chip.urgent { background: var(--urgent-bg); border-color: var(--urgent-border); color: var(--urgent-text); }
+  .chip.neutral { background: #F4F1EA; border-color: #D9D2C4; color: #6B6358; }
+  .history-ctx { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin-bottom: 6px; }
+  .history-notes { font-size: 13px; color: var(--label); line-height: 1.4; margin-top: 6px; }
+  .muted { color: var(--muted); font-size: 13.5px; line-height: 1.5; }
+
+  /* NEXT ACTIONS */
+  .next-action-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; }
+  .na-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 6px; }
+  .na-dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+  .na-dot.triggered { background: var(--urgent-text); }
+  .na-dot.pending { background: var(--muted); }
+  .na-text { font-size: 13.5px; line-height: 1.45; flex: 1; }
+  .na-trigger { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+  .add-rule-btn { width: 100%; margin-top: 10px; padding: 10px; border: 1.5px dashed var(--border); border-radius: 10px; background: transparent; color: var(--muted); font-size: 13px; font-weight: 600; cursor: pointer; }
+
+  /* INVENTORY */
+  .inv-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .status-dot { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid; cursor: pointer; flex-shrink: 0; }
+  .inv-name { flex: 1; font-size: 13.5px; }
+  .inv-amount { width: 90px; border: 1.5px solid var(--border); border-radius: 8px; padding: 6px 8px; font-size: 13px; background: #fff; font-family: inherit; }
+  .icon-btn { border: none; background: transparent; color: var(--muted); cursor: pointer; padding: 4px; display: flex; align-items: center; }
+  .add-row { display: flex; gap: 6px; margin-top: 12px; }
+  .add-row input { flex: 1; }
+  .add-btn { border: none; border-radius: 8px; background: var(--teal); color: #fff; width: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 20px; flex-shrink: 0; }
+
+  /* MODAL */
+  .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; display: flex; align-items: flex-end; }
+  .modal { background: var(--surface); border-radius: 18px 18px 0 0; padding: 20px; width: 100%; max-height: 85vh; overflow-y: auto; }
+  .modal h3 { font-size: 16px; font-weight: 700; margin-bottom: 14px; }
+  .modal label { font-size: 12.5px; font-weight: 600; color: var(--label); display: block; margin-bottom: 4px; margin-top: 10px; }
+  .modal-btns { display: flex; gap: 8px; margin-top: 16px; }
+  .modal-btns button { flex: 1; padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; }
+  .btn-cancel { background: var(--border); color: var(--text); }
+  .btn-save { background: var(--teal); color: #fff; }
+  select { appearance: none; }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1A1815; --surface: #242220; --border: #38342E;
+      --text: #EDE9E0; --muted: #7A7570; --label: #B0A898;
+    }
+    input[type=number], input[type=text], textarea, select, .inv-amount { background: #2E2A26; color: var(--text); }
+    .modal { background: #242220; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="logo">🏊</div>
+    <div>
+      <h1>Pool Log</h1>
+      <p class="subtitle">30′ round · vinyl liner · 25,000 gal</p>
+    </div>
+  </div>
+  <div class="last-reading" id="last-reading-row" style="display:none">
+    <strong>Last reading</strong>
+    <span id="last-reading-time"></span>
+  </div>
+</header>
+
+<div class="context-strip" id="context-strip">
+  <button class="ctx-btn active" data-ctx="maintenance">🔧 Maintenance</button>
+  <button class="ctx-btn" data-ctx="opening">🌱 Opening</button>
+  <button class="ctx-btn" data-ctx="closing">❄️ Closing</button>
+  <button class="ctx-btn" data-ctx="problem">⚠️ Problem</button>
+  <button class="ctx-btn" data-ctx="event">🎉 Event</button>
+</div>
+
+<div id="weather-bar">
+  <div class="weather-inner" id="weather-inner">
+    <span style="color:var(--muted);font-size:13px">Fetching weather…</span>
+  </div>
+  <div id="weather-alerts"></div>
+</div>
+
+<nav>
+  <button class="tab-btn active" data-tab="log">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22a10 10 0 100-20 10 10 0 000 20z"/><path d="M12 6v6l4 2"/></svg>
+    Log Test
+  </button>
+  <button class="tab-btn" data-tab="actions">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+    Next Up
+  </button>
+  <button class="tab-btn" data-tab="history">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+    History
+  </button>
+  <button class="tab-btn" data-tab="inventory">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+    Inventory
+  </button>
+</nav>
+
+<main id="main"></main>
+
+<!-- Add Rule Modal -->
+<div id="rule-modal" class="modal-backdrop" style="display:none">
+  <div class="modal">
+    <h3>Add Next Action Rule</h3>
+    <label>What action?</label>
+    <input type="text" id="rule-action" placeholder="e.g. Shock the pool" />
+    <label>Trigger: by this date</label>
+    <input type="date" id="rule-date" />
+    <label>Trigger: if chlorine drops below (ppm)</label>
+    <input type="number" id="rule-chlorine" placeholder="e.g. 2" step="0.1" />
+    <label>Trigger: if rain exceeds (inches in 24h)</label>
+    <input type="number" id="rule-rain" placeholder="e.g. 0.5" step="0.1" />
+    <div class="modal-btns">
+      <button class="btn-cancel" id="rule-cancel">Cancel</button>
+      <button class="btn-save" id="rule-save">Save Rule</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CONSTANTS ──────────────────────────────────────────────────────────────
+const TARGETS = {
+  chlorine:   { min: 2,   max: 4,   label: 'Chlorine',   unit: 'ppm' },
+  ph:         { min: 7.4, max: 7.6, label: 'pH',         unit: '' },
+  alkalinity: { min: 80,  max: 120, label: 'Alkalinity', unit: 'ppm' },
+  cya:        { min: 30,  max: 50,  label: 'CYA',        unit: 'ppm' },
+  hardness:   { min: 200, max: 400, label: 'Hardness',   unit: 'ppm' },
+};
+const FIELDS = ['chlorine', 'ph', 'alkalinity', 'cya', 'hardness'];
+
+const CTX_INFO = {
+  maintenance: { bg: 'var(--info-bg)',   border: 'var(--info-border)',   text: 'var(--info-text)',   msg: 'Regular maintenance mode. Log today\'s test, check your next actions, and top up chemicals as needed.' },
+  opening:     { bg: 'var(--good-bg)',   border: 'var(--good-border)',   text: 'var(--good-text)',   msg: 'Pool opening mode. Sequence matters: balance alkalinity first, then pH, then add stabilizer (CYA) in a sock near the return jet. Shock last at sunset — never in the morning.' },
+  closing:     { bg: 'var(--info-bg)',   border: 'var(--info-border)',   text: 'var(--info-text)',   msg: 'Closing mode. Target: chlorine 3–4 ppm, pH 7.2–7.6. Add winter algaecide and close with a final shock. Lower water level below skimmer.' },
+  problem:     { bg: 'var(--urgent-bg)', border: 'var(--urgent-border)', text: 'var(--urgent-text)', msg: 'Problem-solving mode. Log current readings first — recommendations will guide next steps based on what\'s out of range. Green water? Check chlorine and CYA first. Cloudy? Check pH and alkalinity.' },
+  event:       { bg: 'var(--warn-bg)',   border: 'var(--warn-border)',   text: 'var(--warn-text)',   msg: 'Event prep mode. Aim to have chlorine at 3–4 ppm 24h before the event. Shock 2 nights before if needed. Don\'t shock the night before — you need chlorine to drop to 1–3 ppm before swimming.' },
+};
+
+const DEFAULT_INVENTORY = [
+  { name: 'In The Swim Shock 24',      amount: '4 lbs',    status: 'low' },
+  { name: 'Soda Ash',                  amount: '4 lbs',    status: 'ok' },
+  { name: 'CYA / Stabilizer',          amount: '0',        status: 'out' },
+  { name: 'Leslie\'s Alkalinity Up',   amount: '5 lbs',    status: 'ok' },
+  { name: 'Baking Soda',               amount: '~5.4 lbs', status: 'ok' },
+  { name: 'HTH pH Down',               amount: '5 lbs',    status: 'ok' },
+  { name: 'HTH Clarifier',             amount: 'partial',  status: 'ok' },
+  { name: 'Malibu Water Perfect',      amount: '1 qt',     status: 'ok' },
+  { name: 'In The Swim Algaecide',     amount: '2 qt',     status: 'ok' },
+  { name: 'In The Swim Algaecide 60+', amount: '1 qt',     status: 'ok' },
+  { name: 'In The Swim Di-Zap',        amount: '8 lbs',    status: 'ok' },
+  { name: 'Spring Stain Away',         amount: '2 qt',     status: 'ok' },
+  { name: 'Leap Pool Wake Up',         amount: 'x1',       status: 'ok' },
+  { name: 'Leap Pool Torpedo',         amount: 'x2',       status: 'ok' },
+  { name: 'Filter Cleaner',            amount: '1 container', status: 'ok' },
+];
+
+// ── STATE ──────────────────────────────────────────────────────────────────
+let state = {
+  ctx: 'maintenance',
+  tab: 'log',
+  reading: { chlorine:'', ph:'', alkalinity:'', cya:'', hardness:'', visibility:'', notes:'' },
+  history: [],
+  inventory: [],
+  rules: [],
+  weather: null,
+};
+
+function load() {
+  try { state.history   = JSON.parse(localStorage.getItem('pool:history'))   || []; } catch(e) { state.history = []; }
+  try { state.inventory = JSON.parse(localStorage.getItem('pool:inventory')) || DEFAULT_INVENTORY.map(x=>({...x})); } catch(e) { state.inventory = DEFAULT_INVENTORY.map(x=>({...x})); }
+  try { state.rules     = JSON.parse(localStorage.getItem('pool:rules'))     || []; } catch(e) { state.rules = []; }
+  if (!state.inventory.length) state.inventory = DEFAULT_INVENTORY.map(x=>({...x}));
+}
+function save(key, data) { try { localStorage.setItem('pool:'+key, JSON.stringify(data)); } catch(e){} }
+
+// ── HELPERS ────────────────────────────────────────────────────────────────
+function getStatus(key, value) {
+  const v = parseFloat(value);
+  if (isNaN(v) || value === '') return null;
+  const t = TARGETS[key];
+  if (v < t.min) return v < t.min * 0.7 ? 'urgent' : 'warn';
+  if (v > t.max) return 'warn';
+  return 'good';
+}
+
+function fmtDate(iso) {
+  return new Date(iso).toLocaleString('en-US', { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' });
+}
+
+function getRecs(r, weather) {
+  const recs = [];
+  const cl = parseFloat(r.chlorine);
+  const ph = parseFloat(r.ph);
+  const alk = parseFloat(r.alkalinity);
+  const cya = parseFloat(r.cya);
+
+  if (!isNaN(cl)) {
+    if (cl <= 1)      recs.push({ level:'urgent', text:'Chlorine critically low — shock tonight at sunset (2 lbs for 25k gal). Never shock in the morning; sunlight burns it off before it works.' });
+    else if (cl < 2)  recs.push({ level:'warn',   text:'Chlorine below range — plan to shock at sunset tonight.' });
+    else if (cl > 4)  recs.push({ level:'info',   text:'Chlorine running high — skip shock tonight, let it burn down naturally.' });
+  }
+  if (!isNaN(ph)) {
+    if (ph < 7.4)     recs.push({ level:'warn', text:`pH low (${ph}) — add soda ash to raise toward 7.4–7.6. Retest after 1 hour with pump running.` });
+    else if (ph > 7.6) recs.push({ level:'warn', text:`pH high (${ph}) — add dry acid (sodium bisulfate) to bring down. Retest after 1 hour.` });
+  }
+  if (!isNaN(alk) && alk < 80) recs.push({ level:'info', text:'Alkalinity below range — add baking soda (raises alk) or soda ash (raises alk + pH together).' });
+  if (!isNaN(alk) && alk > 120) recs.push({ level:'info', text:'Alkalinity high — add muriatic acid or pH Down slowly. Retest after 30 min.' });
+  if (!isNaN(cya)) {
+    if (cya < 30)     recs.push({ level:'warn', text:`CYA low (${cya}) — add stabilizer in a sock near the return jet (never the skimmer). Target: 40 ppm.` });
+    else if (cya > 50) recs.push({ level:'info', text:'CYA high — hold off on adding stabilizer. At next top-off, consider a partial water swap.' });
+  }
+
+  if (weather) {
+    if (weather.rain24h >= 1) recs.push({ level:'warn', text:`Heavy rain (${weather.rain24h}" in last 24h) — retest and likely shock tonight. Rain dilutes chlorine and introduces contaminants.` });
+    else if (weather.rain24h >= 0.5) recs.push({ level:'info', text:`Rain yesterday (${weather.rain24h}") — retest chlorine, may need to shock.` });
+    if (weather.tempF >= 90) recs.push({ level:'info', text:`Hot day (${weather.tempF}°F) — heat burns through chlorine faster. Check levels again before evening.` });
+  }
+
+  if (recs.length === 0 && Object.values(r).some(v => v !== '')) {
+    recs.push({ level:'good', text:'All readings in range — no action needed. Keep the normal routine running.' });
+  }
+  return recs;
+}
+
+const REC_STYLES = {
+  urgent: 'background:var(--urgent-bg);border-color:var(--urgent-border);color:var(--urgent-text)',
+  warn:   'background:var(--warn-bg);border-color:var(--warn-border);color:var(--warn-text)',
+  info:   'background:var(--info-bg);border-color:var(--info-border);color:var(--info-text)',
+  good:   'background:var(--good-bg);border-color:var(--good-border);color:var(--good-text)',
+};
+
+// ── WEATHER ────────────────────────────────────────────────────────────────
+async function fetchWeather() {
+  const bar = document.getElementById('weather-bar');
+  bar.classList.add('visible');
+  if (!navigator.geolocation) return;
+  navigator.geolocation.getCurrentPosition(async pos => {
+    const { latitude: lat, longitude: lon } = pos.coords;
+    try {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,precipitation&daily=precipitation_sum&temperature_unit=fahrenheit&precipitation_unit=inch&forecast_days=2&timezone=auto`;
+      const data = await fetch(url).then(r => r.json());
+      const tempF = Math.round(data.current.temperature_2m);
+      const rain24h = Math.round((data.daily.precipitation_sum[0] || 0) * 10) / 10;
+      state.weather = { tempF, rain24h };
+
+      const inner = document.getElementById('weather-inner');
+      inner.innerHTML = `
+        <div class="weather-stat"><span>🌡️</span><span class="weather-val">${tempF}°F</span></div>
+        <div class="weather-stat"><span>🌧️</span><span class="weather-val">${rain24h}" rain (24h)</span></div>
+      `;
+
+      const alerts = [];
+      if (rain24h >= 1)   alerts.push({ level:'warn',   text:`⚠️ ${rain24h}" rain in last 24h — likely need to retest and shock tonight.` });
+      else if (rain24h >= 0.5) alerts.push({ level:'info', text:`🌧️ ${rain24h}" rain yesterday — check chlorine.` });
+      if (tempF >= 90)    alerts.push({ level:'info',   text:`☀️ Hot day (${tempF}°F) — chlorine burns faster in heat.` });
+
+      const alertDiv = document.getElementById('weather-alerts');
+      alertDiv.innerHTML = alerts.map(a => `<div class="weather-alert" style="${REC_STYLES[a.level]}">${a.text}</div>`).join('');
+
+      render(); // re-render recs with weather data
+    } catch(e) {
+      document.getElementById('weather-inner').innerHTML = '<span style="color:var(--muted);font-size:12px">Weather unavailable</span>';
+    }
+  }, () => {
+    document.getElementById('weather-inner').innerHTML = '<span style="color:var(--muted);font-size:12px">Enable location to see weather alerts</span>';
+  });
+}
+
+// ── RENDER ─────────────────────────────────────────────────────────────────
+function render() {
+  const main = document.getElementById('main');
+  const { tab, ctx, reading, history, inventory, rules, weather } = state;
+
+  // last reading row
+  if (history.length) {
+    document.getElementById('last-reading-row').style.display = 'flex';
+    document.getElementById('last-reading-time').textContent = fmtDate(history[0].timestamp);
+  }
+
+  if (tab === 'log') main.innerHTML = renderLog(ctx, reading, weather);
+  if (tab === 'actions') main.innerHTML = renderActions(rules, history, weather);
+  if (tab === 'history') main.innerHTML = renderHistory(history);
+  if (tab === 'inventory') main.innerHTML = renderInventory(inventory);
+
+  bindEvents();
+}
+
+function renderLog(ctx, reading, weather) {
+  const ci = CTX_INFO[ctx];
+  const recs = getRecs(reading, weather);
+  const fieldHtml = FIELDS.map(key => {
+    const t = TARGETS[key];
+    const s = getStatus(key, reading[key]);
+    return `<div class="field">
+      <label>${t.label} <span class="field-range">${t.min}–${t.max}${t.unit}</span></label>
+      <input type="number" inputmode="decimal" class="${s||''}" data-field="${key}" value="${reading[key]}" placeholder="—" />
+    </div>`;
+  }).join('');
+
+  return `
+    <div class="ctx-card" style="background:${ci.bg};border-color:${ci.border};color:${ci.text}">${ci.msg}</div>
+    <div class="card">
+      <div class="card-title">Today's test</div>
+      <div class="grid">
+        ${fieldHtml}
+        <div class="field" style="grid-column:1/-1">
+          <label>Visibility</label>
+          <input type="text" data-field="visibility" value="${reading.visibility}" placeholder="e.g. clear, 2.5 ft, can see bottom" />
+        </div>
+        <div class="field" style="grid-column:1/-1">
+          <label>Notes</label>
+          <textarea data-field="notes" placeholder="Weather, debris, what you added…">${reading.notes}</textarea>
+        </div>
+      </div>
+      <button class="save-btn" id="save-btn">＋ Save reading</button>
+      <div class="saved-flash" id="saved-flash"></div>
+    </div>
+    ${recs.length ? `
+      <div class="section-label">What to do</div>
+      ${recs.map(r => `<div class="rec-card" style="${REC_STYLES[r.level]}">${r.text}</div>`).join('')}
+    ` : ''}
+  `;
+}
+
+function renderActions(rules, history, weather) {
+  const lastCl = history.length ? parseFloat(history[0].chlorine) : null;
+  const rain24h = weather ? weather.rain24h : 0;
+  const today = new Date().toISOString().split('T')[0];
+
+  const ruleHtml = rules.length ? rules.map((rule, i) => {
+    const triggers = [];
+    let triggered = false;
+    if (rule.byDate && today >= rule.byDate) { triggers.push(`📅 Due by ${rule.byDate}`); triggered = true; }
+    if (rule.ifChlorine && !isNaN(lastCl) && lastCl <= rule.ifChlorine) { triggers.push(`💧 Chlorine at ${lastCl} ppm (threshold: ≤${rule.ifChlorine})`); triggered = true; }
+    if (rule.ifRain && rain24h >= rule.ifRain) { triggers.push(`🌧️ Rain ${rain24h}" (threshold: ≥${rule.ifRain}")`); triggered = true; }
+
+    return `<div class="next-action-card">
+      <div class="na-row">
+        <div class="na-dot ${triggered ? 'triggered' : 'pending'}"></div>
+        <div class="na-text">
+          <strong>${rule.action}</strong>
+          ${triggers.length ? `<div class="na-trigger">${triggered ? '⚡ Triggered: ' : '⏳ Watching: '}${triggers.join(' · ')}</div>` : ''}
+          ${!triggers.length ? `<div class="na-trigger" style="color:var(--muted)">No triggers set — rule is manual</div>` : ''}
+        </div>
+        <button class="icon-btn" data-delete-rule="${i}" title="Remove">✕</button>
+      </div>
+    </div>`;
+  }).join('') : `<p class="muted">No rules yet. Add one below — for example: "Shock the pool" if chlorine drops below 2 or if it rains more than 0.5 inches.</p>`;
+
+  return `
+    <div class="section-label">Next action rules</div>
+    ${ruleHtml}
+    <button class="add-rule-btn" id="add-rule-btn">＋ Add rule</button>
+  `;
+}
+
+function renderHistory(history) {
+  if (!history.length) return `<p class="muted">No readings yet. Log your first test on the Log Test tab.</p>`;
+  return history.map((entry, idx) => {
+    const chips = FIELDS.filter(k => entry[k] !== '' && entry[k] !== undefined).map(k => {
+      const s = getStatus(k, entry[k]);
+      return `<span class="chip ${s||'neutral'}">${TARGETS[k].label}: ${entry[k]}${TARGETS[k].unit}</span>`;
+    }).join('');
+    const visTxt = entry.visibility ? `<span class="chip neutral">👁 ${entry.visibility}</span>` : '';
+    return `<div class="history-card">
+      <div class="history-header">
+        <span class="history-time">${fmtDate(entry.timestamp)}</span>
+        <button class="icon-btn" data-delete="${idx}">✕</button>
+      </div>
+      ${entry.context ? `<div class="history-ctx">${entry.context}</div>` : ''}
+      <div class="chips">${chips}${visTxt}</div>
+      ${entry.notes ? `<div class="history-notes">${entry.notes}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function renderInventory(inventory) {
+  const dotStyle = s => s === 'out' ? `background:var(--dot-out);border-color:var(--dot-out-b)` : s === 'low' ? `background:var(--dot-low);border-color:var(--dot-low-b)` : `background:var(--dot-ok);border-color:var(--dot-ok-b)`;
+  const rows = inventory.map((item, i) => `
+    <div class="inv-row">
+      <button class="status-dot" style="${dotStyle(item.status)}" data-cycle="${i}" title="Cycle: ${item.status}"></button>
+      <span class="inv-name">${item.name}</span>
+      <input class="inv-amount" type="text" value="${item.amount}" data-inv-amount="${i}" />
+      <button class="icon-btn" data-remove-inv="${i}">✕</button>
+    </div>`).join('');
+  return `
+    <div class="section-label" style="margin-bottom:4px">Chemical inventory</div>
+    <p class="muted" style="margin-bottom:10px;font-size:12px">Tap dot to cycle: <span style="color:var(--dot-ok)">●</span> ok · <span style="color:var(--dot-low)">●</span> low · <span style="color:var(--dot-out)">●</span> out</p>
+    <div class="card" style="padding:8px 12px">${rows}
+      <div class="add-row">
+        <input type="text" id="new-item-name" placeholder="New item" />
+        <input type="text" id="new-item-amt" placeholder="Amount" style="width:90px;flex:none" />
+        <button class="add-btn" id="add-inv-btn">＋</button>
+      </div>
+    </div>`;
+}
+
+// ── EVENT BINDING ──────────────────────────────────────────────────────────
+function bindEvents() {
+  // field inputs
+  document.querySelectorAll('[data-field]').forEach(el => {
+    el.addEventListener('input', e => {
+      state.reading[e.target.dataset.field] = e.target.value;
+      const key = e.target.dataset.field;
+      if (FIELDS.includes(key)) {
+        const s = getStatus(key, e.target.value);
+        e.target.className = s || '';
+      }
+      // re-render recs only
+      const recsContainer = document.querySelector('.rec-card');
+      // lightweight: just rerender whole log tab
+      if (state.tab === 'log') {
+        const recs = getRecs(state.reading, state.weather);
+        const existing = document.querySelectorAll('.rec-card');
+        const label = document.querySelector('.section-label');
+        existing.forEach(el => el.remove());
+        if (label) label.remove();
+        if (recs.length) {
+          const main = document.getElementById('main');
+          const div = document.createElement('div');
+          div.innerHTML = `<div class="section-label">What to do</div>${recs.map(r=>`<div class="rec-card" style="${REC_STYLES[r.level]}">${r.text}</div>`).join('')}`;
+          main.appendChild(div);
+        }
+      }
+    });
+  });
+
+  // save reading
+  const saveBtn = document.getElementById('save-btn');
+  if (saveBtn) saveBtn.addEventListener('click', () => {
+    const hasData = FIELDS.some(k => state.reading[k] !== '') || state.reading.visibility || state.reading.notes;
+    if (!hasData) return;
+    const entry = { ...state.reading, context: state.ctx, timestamp: new Date().toISOString() };
+    state.history = [entry, ...state.history].slice(0, 300);
+    save('history', state.history);
+    state.reading = { chlorine:'', ph:'', alkalinity:'', cya:'', hardness:'', visibility:'', notes:'' };
+    render();
+    const flash = document.getElementById('saved-flash');
+    if (flash) { flash.textContent = 'Saved ✓'; setTimeout(() => flash.textContent = '', 1800); }
+  });
+
+  // delete history entry
+  document.querySelectorAll('[data-delete]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.history.splice(parseInt(btn.dataset.delete), 1);
+      save('history', state.history);
+      render();
+    });
+  });
+
+  // inventory cycle status
+  document.querySelectorAll('[data-cycle]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = parseInt(btn.dataset.cycle);
+      const order = ['ok','low','out'];
+      const cur = order.indexOf(state.inventory[i].status);
+      state.inventory[i].status = order[(cur+1) % order.length];
+      save('inventory', state.inventory);
+      render();
+    });
+  });
+
+  // inventory amount edit
+  document.querySelectorAll('[data-inv-amount]').forEach(el => {
+    el.addEventListener('change', e => {
+      state.inventory[parseInt(e.target.dataset.invAmount)].amount = e.target.value;
+      save('inventory', state.inventory);
+    });
+  });
+
+  // remove inventory item
+  document.querySelectorAll('[data-remove-inv]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.inventory.splice(parseInt(btn.dataset.removeInv), 1);
+      save('inventory', state.inventory);
+      render();
+    });
+  });
+
+  // add inventory item
+  const addInvBtn = document.getElementById('add-inv-btn');
+  if (addInvBtn) addInvBtn.addEventListener('click', () => {
+    const name = document.getElementById('new-item-name').value.trim();
+    if (!name) return;
+    const amt = document.getElementById('new-item-amt').value.trim() || '—';
+    state.inventory.push({ name, amount: amt, status: 'ok' });
+    save('inventory', state.inventory);
+    render();
+  });
+
+  // add rule
+  const addRuleBtn = document.getElementById('add-rule-btn');
+  if (addRuleBtn) addRuleBtn.addEventListener('click', () => {
+    document.getElementById('rule-action').value = '';
+    document.getElementById('rule-date').value = '';
+    document.getElementById('rule-chlorine').value = '';
+    document.getElementById('rule-rain').value = '';
+    document.getElementById('rule-modal').style.display = 'flex';
+  });
+
+  // delete rule
+  document.querySelectorAll('[data-delete-rule]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.rules.splice(parseInt(btn.dataset.deleteRule), 1);
+      save('rules', state.rules);
+      render();
+    });
+  });
+}
+
+// ── TABS ────────────────────────────────────────────────────────────────────
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.tab = btn.dataset.tab;
+    render();
+  });
+});
+
+// ── CONTEXT ─────────────────────────────────────────────────────────────────
+document.querySelectorAll('.ctx-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.ctx-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.ctx = btn.dataset.ctx;
+    render();
+  });
+});
+
+// ── MODAL ────────────────────────────────────────────────────────────────────
+document.getElementById('rule-cancel').addEventListener('click', () => {
+  document.getElementById('rule-modal').style.display = 'none';
+});
+document.getElementById('rule-save').addEventListener('click', () => {
+  const action = document.getElementById('rule-action').value.trim();
+  if (!action) return;
+  const rule = {
+    action,
+    byDate:      document.getElementById('rule-date').value || null,
+    ifChlorine:  parseFloat(document.getElementById('rule-chlorine').value) || null,
+    ifRain:      parseFloat(document.getElementById('rule-rain').value) || null,
+  };
+  state.rules.push(rule);
+  save('rules', state.rules);
+  document.getElementById('rule-modal').style.display = 'none';
+  state.tab = 'actions';
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === 'actions'));
+  render();
+});
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+load();
+render();
+fetchWeather();
+</script>
+</body>
+</html>
