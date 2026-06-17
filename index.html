@@ -9,18 +9,14 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #F4F1EA;
-    --surface: #FBF9F4;
-    --border: #E2DDD0;
-    --teal: #1B5E6B;
-    --teal-light: #DCEEF0;
-    --text: #33302A;
-    --muted: #8A8275;
-    --label: #5C574D;
+    --bg: #F4F1EA; --surface: #FBF9F4; --border: #E2DDD0;
+    --teal: #1B5E6B; --teal-light: #DCEEF0;
+    --text: #33302A; --muted: #8A8275; --label: #5C574D;
     --good-bg: #EAF4EE; --good-border: #9FCDB0; --good-text: #2C5F40;
     --warn-bg: #FBF1E0; --warn-border: #E8C290; --warn-text: #9A5B12;
     --urgent-bg: #FBE9E7; --urgent-border: #E8A99E; --urgent-text: #8C3527;
     --info-bg: #EAF1FB; --info-border: #A9C5E8; --info-text: #2A4E7C;
+    --action-bg: #F3EEF8; --action-border: #C9B8E0; --action-text: #5B3F85;
     --dot-ok: #7FB894; --dot-ok-b: #5F9D78;
     --dot-low: #E8B95C; --dot-low-b: #D4A33E;
     --dot-out: #D9776A; --dot-out-b: #C25E50;
@@ -36,81 +32,93 @@
   .last-reading { font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; }
   .last-reading strong { font-weight: 600; }
 
-  /* CONTEXT PICKER */
+  /* CONTEXT */
   .context-strip { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 12px; display: flex; gap: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
   .context-strip::-webkit-scrollbar { display: none; }
-  .ctx-btn { flex-shrink: 0; padding: 6px 14px; border-radius: 999px; border: 1.5px solid var(--border); background: transparent; color: var(--muted); font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+  .ctx-btn { flex-shrink: 0; padding: 6px 14px; border-radius: 999px; border: 1.5px solid var(--border); background: transparent; color: var(--muted); font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
   .ctx-btn.active { background: var(--teal); border-color: var(--teal); color: #fff; }
 
-  /* WEATHER BAR */
+  /* WEATHER */
   #weather-bar { margin: 12px 12px 0; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); padding: 10px 14px; font-size: 13px; color: var(--label); display: none; }
   #weather-bar.visible { display: block; }
   .weather-inner { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
-  .weather-stat { display: flex; align-items: center; gap: 5px; }
-  .weather-label { color: var(--muted); font-size: 11.5px; }
   .weather-val { font-weight: 700; }
   #weather-alerts { margin-top: 8px; }
   .weather-alert { font-size: 13px; line-height: 1.4; padding: 8px 10px; border-radius: 8px; margin-bottom: 6px; border: 1px solid; }
 
   /* TABS */
-  nav { display: flex; gap: 4px; padding: 10px 12px 0; }
-  .tab-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px; padding: 9px 6px; border-radius: 10px; border: 1px solid transparent; background: transparent; color: var(--muted); font-size: 13px; font-weight: 600; cursor: pointer; }
+  nav { display: flex; gap: 3px; padding: 10px 12px 0; }
+  .tab-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 8px 4px; border-radius: 10px; border: 1px solid transparent; background: transparent; color: var(--muted); font-size: 12px; font-weight: 600; cursor: pointer; }
   .tab-btn.active { background: var(--surface); color: var(--teal); border-color: var(--border); }
-  .tab-btn svg { width: 15px; height: 15px; }
+  .tab-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
 
   /* MAIN */
   main { padding: 12px; }
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
   .card-title { font-size: 15px; font-weight: 700; margin-bottom: 12px; }
   .section-label { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 8px; }
-
-  /* CONTEXT INFO CARD */
   .ctx-card { border-radius: 12px; padding: 12px 14px; border: 1px solid; font-size: 13.5px; line-height: 1.5; margin-bottom: 12px; }
 
-  /* LOG FORM */
+  /* FORM */
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .field { display: flex; flex-direction: column; gap: 5px; }
   .field label { font-size: 12px; font-weight: 600; color: var(--label); }
   .field-range { font-weight: 400; color: #A8A095; font-size: 11px; }
   input[type=number], input[type=text], textarea, select {
     border: 1.5px solid var(--border); border-radius: 9px; padding: 10px 12px;
-    font-size: 15px; background: #fff; color: var(--text); outline: none;
-    font-family: inherit; width: 100%;
+    font-size: 15px; background: #fff; color: var(--text); outline: none; font-family: inherit; width: 100%;
   }
-  textarea { min-height: 60px; resize: vertical; }
+  textarea { min-height: 58px; resize: vertical; }
   input.good { border-color: var(--good-border); background: var(--good-bg); }
   input.warn { border-color: var(--warn-border); background: var(--warn-bg); }
   input.urgent { border-color: var(--urgent-border); background: var(--urgent-bg); }
   .save-btn { margin-top: 14px; width: 100%; background: var(--teal); color: #fff; border: none; border-radius: 10px; padding: 13px; font-size: 15px; font-weight: 700; cursor: pointer; }
   .save-btn:active { opacity: 0.85; }
   .saved-flash { text-align: center; color: var(--good-text); font-weight: 600; font-size: 13px; margin-top: 8px; height: 18px; }
+  .sec-btn { margin-top: 10px; width: 100%; background: transparent; color: var(--teal); border: 1.5px solid var(--teal); border-radius: 10px; padding: 11px; font-size: 14px; font-weight: 700; cursor: pointer; }
 
   /* RECS */
   .rec-card { border: 1px solid; border-radius: 12px; padding: 12px 14px; font-size: 13.5px; line-height: 1.45; margin-bottom: 8px; }
 
   /* HISTORY */
   .history-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; }
-  .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .history-card.action-entry { border-color: var(--action-border); background: var(--action-bg); }
+  .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
   .history-time { font-size: 12px; font-weight: 700; color: var(--label); }
-  .chips { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; }
+  .history-type { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 5px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 5px; }
   .chip { border: 1px solid; border-radius: 999px; padding: 3px 9px; font-size: 11.5px; font-weight: 600; }
   .chip.good { background: var(--good-bg); border-color: var(--good-border); color: var(--good-text); }
   .chip.warn { background: var(--warn-bg); border-color: var(--warn-border); color: var(--warn-text); }
   .chip.urgent { background: var(--urgent-bg); border-color: var(--urgent-border); color: var(--urgent-text); }
   .chip.neutral { background: #F4F1EA; border-color: #D9D2C4; color: #6B6358; }
-  .history-ctx { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin-bottom: 6px; }
+  .chip.action { background: var(--action-bg); border-color: var(--action-border); color: var(--action-text); }
   .history-notes { font-size: 13px; color: var(--label); line-height: 1.4; margin-top: 6px; }
   .muted { color: var(--muted); font-size: 13.5px; line-height: 1.5; }
 
-  /* NEXT ACTIONS */
-  .next-action-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; }
-  .na-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 6px; }
-  .na-dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
-  .na-dot.triggered { background: var(--urgent-text); }
-  .na-dot.pending { background: var(--muted); }
-  .na-text { font-size: 13.5px; line-height: 1.45; flex: 1; }
-  .na-trigger { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
-  .add-rule-btn { width: 100%; margin-top: 10px; padding: 10px; border: 1.5px dashed var(--border); border-radius: 10px; background: transparent; color: var(--muted); font-size: 13px; font-weight: 600; cursor: pointer; }
+  /* ACTION TYPE PICKER */
+  .action-type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 4px; }
+  .atype-btn { padding: 10px 8px; border-radius: 10px; border: 1.5px solid var(--border); background: #fff; color: var(--label); font-size: 13px; font-weight: 600; cursor: pointer; text-align: center; }
+  .atype-btn.selected { border-color: var(--teal); background: var(--teal-light); color: var(--teal); }
+
+  /* NEXT UP RULES */
+  .rule-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; }
+  .rule-card.triggered { border-color: var(--urgent-border); background: var(--urgent-bg); }
+  .rule-header { display: flex; align-items: flex-start; gap: 10px; }
+  .rule-dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; background: var(--muted); }
+  .rule-dot.triggered { background: var(--urgent-text); }
+  .rule-body { flex: 1; }
+  .rule-action { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+  .rule-triggers { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .rule-triggers span { display: inline-block; }
+  .rule-lastdone { font-size: 11.5px; color: var(--good-text); margin-top: 4px; font-weight: 600; }
+  .rule-triggered-msg { font-size: 12.5px; color: var(--urgent-text); font-weight: 700; margin-top: 4px; }
+  .add-rule-btn { width: 100%; margin-top: 8px; padding: 10px; border: 1.5px dashed var(--border); border-radius: 10px; background: transparent; color: var(--muted); font-size: 13px; font-weight: 600; cursor: pointer; }
+  .preset-section { margin-bottom: 14px; }
+  .preset-label { font-size: 11.5px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 7px; }
+  .preset-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .preset-chip { padding: 6px 12px; border-radius: 999px; border: 1.5px solid var(--teal); background: transparent; color: var(--teal); font-size: 12.5px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  .preset-chip:active { background: var(--teal-light); }
 
   /* INVENTORY */
   .inv-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); }
@@ -119,27 +127,25 @@
   .inv-amount { width: 90px; border: 1.5px solid var(--border); border-radius: 8px; padding: 6px 8px; font-size: 13px; background: #fff; font-family: inherit; }
   .icon-btn { border: none; background: transparent; color: var(--muted); cursor: pointer; padding: 4px; display: flex; align-items: center; }
   .add-row { display: flex; gap: 6px; margin-top: 12px; }
-  .add-row input { flex: 1; }
   .add-btn { border: none; border-radius: 8px; background: var(--teal); color: #fff; width: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 20px; flex-shrink: 0; }
 
   /* MODAL */
-  .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; display: flex; align-items: flex-end; }
-  .modal { background: var(--surface); border-radius: 18px 18px 0 0; padding: 20px; width: 100%; max-height: 85vh; overflow-y: auto; }
+  .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 100; display: flex; align-items: flex-end; }
+  .modal { background: var(--surface); border-radius: 18px 18px 0 0; padding: 20px; width: 100%; max-height: 88vh; overflow-y: auto; }
   .modal h3 { font-size: 16px; font-weight: 700; margin-bottom: 14px; }
-  .modal label { font-size: 12.5px; font-weight: 600; color: var(--label); display: block; margin-bottom: 4px; margin-top: 10px; }
+  .modal label { font-size: 12.5px; font-weight: 600; color: var(--label); display: block; margin-bottom: 4px; margin-top: 12px; }
   .modal-btns { display: flex; gap: 8px; margin-top: 16px; }
   .modal-btns button { flex: 1; padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; }
   .btn-cancel { background: var(--border); color: var(--text); }
   .btn-save { background: var(--teal); color: #fff; }
   select { appearance: none; }
+  .inv-deduct-note { font-size: 12px; color: var(--good-text); margin-top: 4px; font-weight: 600; min-height: 16px; }
 
   @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #1A1815; --surface: #242220; --border: #38342E;
-      --text: #EDE9E0; --muted: #7A7570; --label: #B0A898;
-    }
-    input[type=number], input[type=text], textarea, select, .inv-amount { background: #2E2A26; color: var(--text); }
+    :root { --bg: #1A1815; --surface: #242220; --border: #38342E; --text: #EDE9E0; --muted: #7A7570; --label: #B0A898; }
+    input[type=number], input[type=text], textarea, select, .inv-amount, .atype-btn { background: #2E2A26; color: var(--text); }
     .modal { background: #242220; }
+    .chip.neutral { background: #2E2A26; }
   }
 </style>
 </head>
@@ -150,7 +156,7 @@
     <div class="logo">🏊</div>
     <div>
       <h1>Pool Log</h1>
-      <p class="subtitle">30′ round · vinyl liner · 25,000 gal</p>
+      <p class="subtitle">30′ round · vinyl liner · 25,000 gal · Mineral Frog</p>
     </div>
   </div>
   <div class="last-reading" id="last-reading-row" style="display:none">
@@ -159,7 +165,7 @@
   </div>
 </header>
 
-<div class="context-strip" id="context-strip">
+<div class="context-strip">
   <button class="ctx-btn active" data-ctx="maintenance">🔧 Maintenance</button>
   <button class="ctx-btn" data-ctx="opening">🌱 Opening</button>
   <button class="ctx-btn" data-ctx="closing">❄️ Closing</button>
@@ -176,10 +182,10 @@
 
 <nav>
   <button class="tab-btn active" data-tab="log">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22a10 10 0 100-20 10 10 0 000 20z"/><path d="M12 6v6l4 2"/></svg>
-    Log Test
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+    Log
   </button>
-  <button class="tab-btn" data-tab="actions">
+  <button class="tab-btn" data-tab="nextup">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
     Next Up
   </button>
@@ -195,18 +201,54 @@
 
 <main id="main"></main>
 
-<!-- Add Rule Modal -->
+<!-- LOG ACTION MODAL -->
+<div id="action-modal" class="modal-backdrop" style="display:none">
+  <div class="modal">
+    <h3>Log an Action</h3>
+    <label>What did you do?</label>
+    <div class="action-type-grid" id="atype-grid">
+      <button class="atype-btn selected" data-atype="Added chemical">⚗️ Added chemical</button>
+      <button class="atype-btn" data-atype="Shocked">⚡ Shocked</button>
+      <button class="atype-btn" data-atype="Cleaned filter">🔧 Cleaned filter</button>
+      <button class="atype-btn" data-atype="Backwashed">💧 Backwashed</button>
+      <button class="atype-btn" data-atype="Vacuumed">🌀 Vacuumed</button>
+      <button class="atype-btn" data-atype="Other">📝 Other</button>
+    </div>
+    <div id="chemical-fields">
+      <label>Chemical used (from inventory)</label>
+      <select id="action-chemical">
+        <option value="">— select or leave blank —</option>
+      </select>
+      <label>Amount used</label>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="text" id="action-amount" placeholder="e.g. 2 lbs, 1 qt" style="flex:1" />
+      </div>
+      <div class="inv-deduct-note" id="deduct-note"></div>
+    </div>
+    <label>Notes (optional)</label>
+    <textarea id="action-notes" placeholder="Any additional details…"></textarea>
+    <div class="modal-btns">
+      <button class="btn-cancel" id="action-cancel">Cancel</button>
+      <button class="btn-save" id="action-save">Save Action</button>
+    </div>
+  </div>
+</div>
+
+<!-- RULE MODAL -->
 <div id="rule-modal" class="modal-backdrop" style="display:none">
   <div class="modal">
-    <h3>Add Next Action Rule</h3>
-    <label>What action?</label>
+    <h3>Add Rule</h3>
+    <label>Action to watch for</label>
     <input type="text" id="rule-action" placeholder="e.g. Shock the pool" />
-    <label>Trigger: by this date</label>
+    <p style="font-size:12px;color:var(--muted);margin-top:6px">Set one or more triggers. The rule fires when ANY condition is met.</p>
+    <label>📅 By this date</label>
     <input type="date" id="rule-date" />
-    <label>Trigger: if chlorine drops below (ppm)</label>
-    <input type="number" id="rule-chlorine" placeholder="e.g. 2" step="0.1" />
-    <label>Trigger: if rain exceeds (inches in 24h)</label>
+    <label>💧 If chlorine drops below (ppm)</label>
+    <input type="number" id="rule-chlorine" placeholder="e.g. 0.5" step="0.1" />
+    <label>🌧️ If rain exceeds (inches in 24h)</label>
     <input type="number" id="rule-rain" placeholder="e.g. 0.5" step="0.1" />
+    <label>🔁 Repeat every (days) after action is logged</label>
+    <input type="number" id="rule-repeat" placeholder="e.g. 7 for weekly" step="1" min="1" />
     <div class="modal-btns">
       <button class="btn-cancel" id="rule-cancel">Cancel</button>
       <button class="btn-save" id="rule-save">Save Rule</button>
@@ -216,8 +258,9 @@
 
 <script>
 // ── CONSTANTS ──────────────────────────────────────────────────────────────
+// Mineral Frog system: lower chlorine targets (minerals do the heavy lifting)
 const TARGETS = {
-  chlorine:   { min: 2,   max: 4,   label: 'Chlorine',   unit: 'ppm' },
+  chlorine:   { min: 0.5, max: 1.5, label: 'Chlorine',   unit: 'ppm' },
   ph:         { min: 7.4, max: 7.6, label: 'pH',         unit: '' },
   alkalinity: { min: 80,  max: 120, label: 'Alkalinity', unit: 'ppm' },
   cya:        { min: 30,  max: 50,  label: 'CYA',        unit: 'ppm' },
@@ -226,62 +269,82 @@ const TARGETS = {
 const FIELDS = ['chlorine', 'ph', 'alkalinity', 'cya', 'hardness'];
 
 const CTX_INFO = {
-  maintenance: { bg: 'var(--info-bg)',   border: 'var(--info-border)',   text: 'var(--info-text)',   msg: 'Regular maintenance mode. Log today\'s test, check your next actions, and top up chemicals as needed.' },
-  opening:     { bg: 'var(--good-bg)',   border: 'var(--good-border)',   text: 'var(--good-text)',   msg: 'Pool opening mode. Sequence matters: balance alkalinity first, then pH, then add stabilizer (CYA) in a sock near the return jet. Shock last at sunset — never in the morning.' },
-  closing:     { bg: 'var(--info-bg)',   border: 'var(--info-border)',   text: 'var(--info-text)',   msg: 'Closing mode. Target: chlorine 3–4 ppm, pH 7.2–7.6. Add winter algaecide and close with a final shock. Lower water level below skimmer.' },
-  problem:     { bg: 'var(--urgent-bg)', border: 'var(--urgent-border)', text: 'var(--urgent-text)', msg: 'Problem-solving mode. Log current readings first — recommendations will guide next steps based on what\'s out of range. Green water? Check chlorine and CYA first. Cloudy? Check pH and alkalinity.' },
-  event:       { bg: 'var(--warn-bg)',   border: 'var(--warn-border)',   text: 'var(--warn-text)',   msg: 'Event prep mode. Aim to have chlorine at 3–4 ppm 24h before the event. Shock 2 nights before if needed. Don\'t shock the night before — you need chlorine to drop to 1–3 ppm before swimming.' },
+  maintenance: { bg:'var(--info-bg)',   border:'var(--info-border)',   text:'var(--info-text)',   msg:'Regular maintenance. Mineral Frog target: chlorine 0.5–1.5 ppm. Log your test, check next actions, top up as needed.' },
+  opening:     { bg:'var(--good-bg)',   border:'var(--good-border)',   text:'var(--good-text)',   msg:'Pool opening. Sequence: alkalinity first → pH → CYA stabilizer (in a sock near return jet, never the skimmer) → shock last at sunset. Install fresh Mineral Frog cartridge before opening.' },
+  closing:     { bg:'var(--info-bg)',   border:'var(--info-border)',   text:'var(--info-text)',   msg:'Closing. Target: chlorine 1–2 ppm, pH 7.2–7.6. Add winter algaecide and close with a final shock. Lower water below skimmer. Remove Mineral Frog cartridge for winter.' },
+  problem:     { bg:'var(--urgent-bg)', border:'var(--urgent-border)', text:'var(--urgent-text)', msg:'Problem mode. Log current readings — recommendations will guide you. Green water: check chlorine + CYA first. Cloudy: check pH + alkalinity. With Mineral Frog, also check if cartridge needs replacing.' },
+  event:       { bg:'var(--warn-bg)',   border:'var(--warn-border)',   text:'var(--warn-text)',   msg:'Event prep. Aim for chlorine 1–1.5 ppm 24h before. Shock 2 nights before if needed. Chlorine should be ≤1.5 ppm before swimming. With heavy swimmer load, retest after the event.' },
 };
 
-const DEFAULT_INVENTORY = [
-  { name: 'In The Swim Shock 24',      amount: '4 lbs',    status: 'low' },
-  { name: 'Soda Ash',                  amount: '4 lbs',    status: 'ok' },
-  { name: 'CYA / Stabilizer',          amount: '0',        status: 'out' },
-  { name: 'Leslie\'s Alkalinity Up',   amount: '5 lbs',    status: 'ok' },
-  { name: 'Baking Soda',               amount: '~5.4 lbs', status: 'ok' },
-  { name: 'HTH pH Down',               amount: '5 lbs',    status: 'ok' },
-  { name: 'HTH Clarifier',             amount: 'partial',  status: 'ok' },
-  { name: 'Malibu Water Perfect',      amount: '1 qt',     status: 'ok' },
-  { name: 'In The Swim Algaecide',     amount: '2 qt',     status: 'ok' },
-  { name: 'In The Swim Algaecide 60+', amount: '1 qt',     status: 'ok' },
-  { name: 'In The Swim Di-Zap',        amount: '8 lbs',    status: 'ok' },
-  { name: 'Spring Stain Away',         amount: '2 qt',     status: 'ok' },
-  { name: 'Leap Pool Wake Up',         amount: 'x1',       status: 'ok' },
-  { name: 'Leap Pool Torpedo',         amount: 'x2',       status: 'ok' },
-  { name: 'Filter Cleaner',            amount: '1 container', status: 'ok' },
+const PRESET_RULES = [
+  { action:'Shock the pool', ifChlorine:0.5, ifRain:0.5, repeatDays:7, label:'Shock (chlorine < 0.5 or rain > 0.5")' },
+  { action:'Test water chemistry', repeatDays:7, label:'Test weekly' },
+  { action:'Check Mineral Frog cartridge', repeatDays:30, label:'Check Mineral Frog (monthly)' },
+  { action:'Clean filter', repeatDays:14, label:'Clean filter (biweekly)' },
+  { action:'Backwash filter', repeatDays:30, label:'Backwash filter (monthly)' },
 ];
 
-// ── STATE ──────────────────────────────────────────────────────────────────
+const DEFAULT_INVENTORY = [
+  { name:'In The Swim Shock 24',      amount:'4',   unit:'lbs', status:'low' },
+  { name:'Soda Ash',                  amount:'4',   unit:'lbs', status:'ok' },
+  { name:'CYA / Stabilizer',          amount:'0',   unit:'lbs', status:'out' },
+  { name:"Leslie's Alkalinity Up",    amount:'5',   unit:'lbs', status:'ok' },
+  { name:'Baking Soda',               amount:'5.4', unit:'lbs', status:'ok' },
+  { name:'HTH pH Down',               amount:'5',   unit:'lbs', status:'ok' },
+  { name:'HTH Clarifier',             amount:'',    unit:'partial', status:'ok' },
+  { name:'Malibu Water Perfect',      amount:'1',   unit:'qt',  status:'ok' },
+  { name:'In The Swim Algaecide',     amount:'2',   unit:'qt',  status:'ok' },
+  { name:'In The Swim Algaecide 60+', amount:'1',   unit:'qt',  status:'ok' },
+  { name:'In The Swim Di-Zap',        amount:'8',   unit:'lbs', status:'ok' },
+  { name:'Spring Stain Away',         amount:'2',   unit:'qt',  status:'ok' },
+  { name:'Leap Pool Wake Up',         amount:'1',   unit:'x',   status:'ok' },
+  { name:'Leap Pool Torpedo',         amount:'2',   unit:'x',   status:'ok' },
+  { name:'Filter Cleaner',            amount:'1',   unit:'container', status:'ok' },
+];
+
+// ── STATE ────────────────────────────────────────────────────────────────────
 let state = {
-  ctx: 'maintenance',
-  tab: 'log',
+  ctx: 'maintenance', tab: 'log',
   reading: { chlorine:'', ph:'', alkalinity:'', cya:'', hardness:'', visibility:'', notes:'' },
-  history: [],
+  log: [],        // combined: { type:'test'|'action', ...fields, timestamp, ctx }
   inventory: [],
   rules: [],
   weather: null,
+  actionType: 'Added chemical',
 };
 
 function load() {
-  try { state.history   = JSON.parse(localStorage.getItem('pool:history'))   || []; } catch(e) { state.history = []; }
+  try { state.log       = JSON.parse(localStorage.getItem('pool:log'))       || []; } catch(e) { state.log = []; }
+  // Migrate old 'pool:history' entries if present
+  try {
+    const old = JSON.parse(localStorage.getItem('pool:history'));
+    if (old && old.length && !state.log.length) {
+      state.log = old.map(e => ({ ...e, type: e.type || 'test' }));
+      save('log', state.log);
+    }
+  } catch(e) {}
   try { state.inventory = JSON.parse(localStorage.getItem('pool:inventory')) || DEFAULT_INVENTORY.map(x=>({...x})); } catch(e) { state.inventory = DEFAULT_INVENTORY.map(x=>({...x})); }
   try { state.rules     = JSON.parse(localStorage.getItem('pool:rules'))     || []; } catch(e) { state.rules = []; }
   if (!state.inventory.length) state.inventory = DEFAULT_INVENTORY.map(x=>({...x}));
 }
 function save(key, data) { try { localStorage.setItem('pool:'+key, JSON.stringify(data)); } catch(e){} }
 
-// ── HELPERS ────────────────────────────────────────────────────────────────
+// ── HELPERS ──────────────────────────────────────────────────────────────────
 function getStatus(key, value) {
   const v = parseFloat(value);
   if (isNaN(v) || value === '') return null;
   const t = TARGETS[key];
-  if (v < t.min) return v < t.min * 0.7 ? 'urgent' : 'warn';
+  if (v < t.min) return v < t.min * 0.5 ? 'urgent' : 'warn';
   if (v > t.max) return 'warn';
   return 'good';
 }
 
 function fmtDate(iso) {
   return new Date(iso).toLocaleString('en-US', { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' });
+}
+
+function daysSince(iso) {
+  return Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
 }
 
 function getRecs(r, weather) {
@@ -291,30 +354,32 @@ function getRecs(r, weather) {
   const alk = parseFloat(r.alkalinity);
   const cya = parseFloat(r.cya);
 
+  // Mineral Frog targets: 0.5–1.5 ppm chlorine
   if (!isNaN(cl)) {
-    if (cl <= 1)      recs.push({ level:'urgent', text:'Chlorine critically low — shock tonight at sunset (2 lbs for 25k gal). Never shock in the morning; sunlight burns it off before it works.' });
-    else if (cl < 2)  recs.push({ level:'warn',   text:'Chlorine below range — plan to shock at sunset tonight.' });
-    else if (cl > 4)  recs.push({ level:'info',   text:'Chlorine running high — skip shock tonight, let it burn down naturally.' });
+    if (cl <= 0)         recs.push({ level:'urgent', text:'No chlorine detected — shock tonight at sunset (2 lbs for 25k gal). Do not wait. Never shock in morning; sunlight destroys it before it works.' });
+    else if (cl < 0.5)   recs.push({ level:'urgent', text:`Chlorine critically low (${cl} ppm) — shock tonight at sunset. Mineral Frog systems need at least 0.5 ppm free chlorine to work effectively.` });
+    else if (cl < 1.0)   recs.push({ level:'warn',   text:`Chlorine low (${cl} ppm) — consider shocking at sunset to bring back to 1–1.5 ppm range.` });
+    else if (cl > 1.5)   recs.push({ level:'info',   text:`Chlorine slightly above target (${cl} ppm) — fine to swim. Skip shock, let it burn down naturally.` });
   }
   if (!isNaN(ph)) {
-    if (ph < 7.4)     recs.push({ level:'warn', text:`pH low (${ph}) — add soda ash to raise toward 7.4–7.6. Retest after 1 hour with pump running.` });
-    else if (ph > 7.6) recs.push({ level:'warn', text:`pH high (${ph}) — add dry acid (sodium bisulfate) to bring down. Retest after 1 hour.` });
+    if (ph < 7.4)        recs.push({ level:'warn', text:`pH low (${ph}) — add soda ash to raise toward 7.4–7.6. Retest after 1 hour with pump running.` });
+    else if (ph > 7.6)   recs.push({ level:'warn', text:`pH high (${ph}) — add pH Down (sodium bisulfate). Retest after 1 hour.` });
   }
-  if (!isNaN(alk) && alk < 80) recs.push({ level:'info', text:'Alkalinity below range — add baking soda (raises alk) or soda ash (raises alk + pH together).' });
-  if (!isNaN(alk) && alk > 120) recs.push({ level:'info', text:'Alkalinity high — add muriatic acid or pH Down slowly. Retest after 30 min.' });
+  if (!isNaN(alk)) {
+    if (alk < 80)        recs.push({ level:'info', text:'Alkalinity low — add baking soda (raises alk only) or soda ash (raises alk + pH together).' });
+    else if (alk > 120)  recs.push({ level:'info', text:'Alkalinity high — add pH Down slowly. Retest after 30 min.' });
+  }
   if (!isNaN(cya)) {
-    if (cya < 30)     recs.push({ level:'warn', text:`CYA low (${cya}) — add stabilizer in a sock near the return jet (never the skimmer). Target: 40 ppm.` });
-    else if (cya > 50) recs.push({ level:'info', text:'CYA high — hold off on adding stabilizer. At next top-off, consider a partial water swap.' });
+    if (cya < 30)        recs.push({ level:'warn', text:`CYA low (${cya} ppm) — add stabilizer in a sock near the return jet, never the skimmer. Target: 40 ppm.` });
+    else if (cya > 50)   recs.push({ level:'info', text:'CYA high — hold off adding stabilizer. Partial water swap at next top-off.' });
   }
-
   if (weather) {
-    if (weather.rain24h >= 1) recs.push({ level:'warn', text:`Heavy rain (${weather.rain24h}" in last 24h) — retest and likely shock tonight. Rain dilutes chlorine and introduces contaminants.` });
-    else if (weather.rain24h >= 0.5) recs.push({ level:'info', text:`Rain yesterday (${weather.rain24h}") — retest chlorine, may need to shock.` });
-    if (weather.tempF >= 90) recs.push({ level:'info', text:`Hot day (${weather.tempF}°F) — heat burns through chlorine faster. Check levels again before evening.` });
+    if (weather.rain24h >= 1)         recs.push({ level:'warn', text:`Heavy rain (${weather.rain24h}" in 24h) — retest chlorine and likely shock tonight.` });
+    else if (weather.rain24h >= 0.5)  recs.push({ level:'info', text:`Rain yesterday (${weather.rain24h}") — check chlorine, may need to shock.` });
+    if (weather.tempF >= 90)          recs.push({ level:'info', text:`Hot day (${weather.tempF}°F) — heat accelerates chlorine loss. Check again tonight.` });
   }
-
   if (recs.length === 0 && Object.values(r).some(v => v !== '')) {
-    recs.push({ level:'good', text:'All readings in range — no action needed. Keep the normal routine running.' });
+    recs.push({ level:'good', text:'All readings in range — no action needed. Mineral Frog is doing its job.' });
   }
   return recs;
 }
@@ -326,11 +391,44 @@ const REC_STYLES = {
   good:   'background:var(--good-bg);border-color:var(--good-border);color:var(--good-text)',
 };
 
-// ── WEATHER ────────────────────────────────────────────────────────────────
+function invDisplayAmount(item) {
+  if (!item.amount && !item.unit) return '—';
+  if (item.unit === 'partial' || item.unit === 'container' || item.unit === 'x') return `${item.amount || ''} ${item.unit}`.trim();
+  return item.amount ? `${item.amount} ${item.unit}` : item.unit;
+}
+
+function deductInventory(idx, amountStr) {
+  const item = state.inventory[idx];
+  const used = parseFloat(amountStr);
+  const cur = parseFloat(item.amount);
+  if (isNaN(used) || isNaN(cur)) return null; // can't deduct
+  const remaining = Math.max(0, Math.round((cur - used) * 10) / 10);
+  item.amount = String(remaining);
+  if (remaining <= 0) item.status = 'out';
+  else if (remaining <= cur * 0.25) item.status = 'low';
+  return remaining;
+}
+
+// Find last time an action matching a rule was logged
+function lastActionForRule(rule) {
+  const keyword = rule.action.toLowerCase();
+  const match = state.log.find(e => e.type === 'action' && e.actionType && (
+    e.actionType.toLowerCase().includes('shock') && keyword.includes('shock') ||
+    e.actionType.toLowerCase().includes('clean') && keyword.includes('clean') ||
+    e.actionType.toLowerCase().includes('backwash') && keyword.includes('backwash') ||
+    e.actionType.toLowerCase().includes('vacuum') && keyword.includes('vacuum') ||
+    e.actionType.toLowerCase().includes('test') && keyword.includes('test') ||
+    (e.actionType === 'Other' && e.notes && e.notes.toLowerCase().includes(keyword)) ||
+    (e.chemical && e.chemical.toLowerCase().includes(keyword))
+  ));
+  return match ? match.timestamp : null;
+}
+
+// ── WEATHER ──────────────────────────────────────────────────────────────────
 async function fetchWeather() {
   const bar = document.getElementById('weather-bar');
   bar.classList.add('visible');
-  if (!navigator.geolocation) return;
+  if (!navigator.geolocation) { bar.classList.remove('visible'); return; }
   navigator.geolocation.getCurrentPosition(async pos => {
     const { latitude: lat, longitude: lon } = pos.coords;
     try {
@@ -339,122 +437,155 @@ async function fetchWeather() {
       const tempF = Math.round(data.current.temperature_2m);
       const rain24h = Math.round((data.daily.precipitation_sum[0] || 0) * 10) / 10;
       state.weather = { tempF, rain24h };
-
-      const inner = document.getElementById('weather-inner');
-      inner.innerHTML = `
-        <div class="weather-stat"><span>🌡️</span><span class="weather-val">${tempF}°F</span></div>
-        <div class="weather-stat"><span>🌧️</span><span class="weather-val">${rain24h}" rain (24h)</span></div>
+      document.getElementById('weather-inner').innerHTML = `
+        <div style="display:flex;gap:5px;align-items:center"><span>🌡️</span><span class="weather-val">${tempF}°F</span></div>
+        <div style="display:flex;gap:5px;align-items:center"><span>🌧️</span><span class="weather-val">${rain24h}" today</span></div>
       `;
-
       const alerts = [];
-      if (rain24h >= 1)   alerts.push({ level:'warn',   text:`⚠️ ${rain24h}" rain in last 24h — likely need to retest and shock tonight.` });
-      else if (rain24h >= 0.5) alerts.push({ level:'info', text:`🌧️ ${rain24h}" rain yesterday — check chlorine.` });
-      if (tempF >= 90)    alerts.push({ level:'info',   text:`☀️ Hot day (${tempF}°F) — chlorine burns faster in heat.` });
-
-      const alertDiv = document.getElementById('weather-alerts');
-      alertDiv.innerHTML = alerts.map(a => `<div class="weather-alert" style="${REC_STYLES[a.level]}">${a.text}</div>`).join('');
-
-      render(); // re-render recs with weather data
+      if (rain24h >= 1)        alerts.push({ level:'warn', text:`⚠️ ${rain24h}" rain today — retest chlorine and likely shock tonight.` });
+      else if (rain24h >= 0.5) alerts.push({ level:'info', text:`🌧️ ${rain24h}" rain today — check chlorine.` });
+      if (tempF >= 90)         alerts.push({ level:'info', text:`☀️ ${tempF}°F — heat burns chlorine faster. Check again tonight.` });
+      document.getElementById('weather-alerts').innerHTML = alerts.map(a => `<div class="weather-alert" style="${REC_STYLES[a.level]}">${a.text}</div>`).join('');
+      render();
     } catch(e) {
       document.getElementById('weather-inner').innerHTML = '<span style="color:var(--muted);font-size:12px">Weather unavailable</span>';
     }
   }, () => {
-    document.getElementById('weather-inner').innerHTML = '<span style="color:var(--muted);font-size:12px">Enable location to see weather alerts</span>';
+    document.getElementById('weather-inner').innerHTML = '<span style="color:var(--muted);font-size:12px">Enable location for weather alerts</span>';
   });
 }
 
-// ── RENDER ─────────────────────────────────────────────────────────────────
+// ── RENDER ───────────────────────────────────────────────────────────────────
 function render() {
   const main = document.getElementById('main');
-  const { tab, ctx, reading, history, inventory, rules, weather } = state;
-
-  // last reading row
-  if (history.length) {
+  const tests = state.log.filter(e => e.type === 'test' || !e.type);
+  if (tests.length) {
     document.getElementById('last-reading-row').style.display = 'flex';
-    document.getElementById('last-reading-time').textContent = fmtDate(history[0].timestamp);
+    document.getElementById('last-reading-time').textContent = fmtDate(tests[0].timestamp);
   }
-
-  if (tab === 'log') main.innerHTML = renderLog(ctx, reading, weather);
-  if (tab === 'actions') main.innerHTML = renderActions(rules, history, weather);
-  if (tab === 'history') main.innerHTML = renderHistory(history);
-  if (tab === 'inventory') main.innerHTML = renderInventory(inventory);
-
+  if (state.tab === 'log')       main.innerHTML = renderLog();
+  if (state.tab === 'nextup')    main.innerHTML = renderNextUp();
+  if (state.tab === 'history')   main.innerHTML = renderHistory();
+  if (state.tab === 'inventory') main.innerHTML = renderInventory();
   bindEvents();
 }
 
-function renderLog(ctx, reading, weather) {
-  const ci = CTX_INFO[ctx];
-  const recs = getRecs(reading, weather);
+// LOG TAB
+function renderLog() {
+  const ci = CTX_INFO[state.ctx];
+  const recs = getRecs(state.reading, state.weather);
   const fieldHtml = FIELDS.map(key => {
     const t = TARGETS[key];
-    const s = getStatus(key, reading[key]);
+    const s = getStatus(key, state.reading[key]);
     return `<div class="field">
       <label>${t.label} <span class="field-range">${t.min}–${t.max}${t.unit}</span></label>
-      <input type="number" inputmode="decimal" class="${s||''}" data-field="${key}" value="${reading[key]}" placeholder="—" />
+      <input type="number" inputmode="decimal" class="${s||''}" data-field="${key}" value="${state.reading[key]}" placeholder="—" />
     </div>`;
   }).join('');
-
   return `
     <div class="ctx-card" style="background:${ci.bg};border-color:${ci.border};color:${ci.text}">${ci.msg}</div>
     <div class="card">
-      <div class="card-title">Today's test</div>
+      <div class="card-title">Test readings</div>
       <div class="grid">
         ${fieldHtml}
         <div class="field" style="grid-column:1/-1">
           <label>Visibility</label>
-          <input type="text" data-field="visibility" value="${reading.visibility}" placeholder="e.g. clear, 2.5 ft, can see bottom" />
+          <input type="text" data-field="visibility" value="${state.reading.visibility}" placeholder="e.g. clear, can see bottom" />
         </div>
         <div class="field" style="grid-column:1/-1">
           <label>Notes</label>
-          <textarea data-field="notes" placeholder="Weather, debris, what you added…">${reading.notes}</textarea>
+          <textarea data-field="notes" placeholder="Weather, debris, observations…">${state.reading.notes}</textarea>
         </div>
       </div>
-      <button class="save-btn" id="save-btn">＋ Save reading</button>
+      <button class="save-btn" id="save-btn">💾 Save test</button>
       <div class="saved-flash" id="saved-flash"></div>
     </div>
-    ${recs.length ? `
-      <div class="section-label">What to do</div>
-      ${recs.map(r => `<div class="rec-card" style="${REC_STYLES[r.level]}">${r.text}</div>`).join('')}
-    ` : ''}
+    <button class="sec-btn" id="open-action-modal">⚗️ Log an action (chemical added, shocked, cleaned…)</button>
+    ${recs.length ? `<div style="margin-top:14px"><div class="section-label">What to do</div>${recs.map(r=>`<div class="rec-card" style="${REC_STYLES[r.level]}">${r.text}</div>`).join('')}</div>` : ''}
   `;
 }
 
-function renderActions(rules, history, weather) {
-  const lastCl = history.length ? parseFloat(history[0].chlorine) : null;
-  const rain24h = weather ? weather.rain24h : 0;
+// NEXT UP TAB
+function renderNextUp() {
+  const lastCl = (state.log.find(e => e.type === 'test' && e.chlorine !== '')) ? parseFloat(state.log.find(e => e.type === 'test' && e.chlorine !== '').chlorine) : null;
+  const rain24h = state.weather ? state.weather.rain24h : 0;
   const today = new Date().toISOString().split('T')[0];
 
-  const ruleHtml = rules.length ? rules.map((rule, i) => {
+  // Existing presets not already added
+  const existingActions = state.rules.map(r => r.action);
+  const availablePresets = PRESET_RULES.filter(p => !existingActions.includes(p.action));
+
+  const rulesHtml = state.rules.length ? state.rules.map((rule, i) => {
     const triggers = [];
     let triggered = false;
-    if (rule.byDate && today >= rule.byDate) { triggers.push(`📅 Due by ${rule.byDate}`); triggered = true; }
-    if (rule.ifChlorine && !isNaN(lastCl) && lastCl <= rule.ifChlorine) { triggers.push(`💧 Chlorine at ${lastCl} ppm (threshold: ≤${rule.ifChlorine})`); triggered = true; }
-    if (rule.ifRain && rain24h >= rule.ifRain) { triggers.push(`🌧️ Rain ${rain24h}" (threshold: ≥${rule.ifRain}")`); triggered = true; }
+    const lastDone = lastActionForRule(rule);
 
-    return `<div class="next-action-card">
-      <div class="na-row">
-        <div class="na-dot ${triggered ? 'triggered' : 'pending'}"></div>
-        <div class="na-text">
-          <strong>${rule.action}</strong>
-          ${triggers.length ? `<div class="na-trigger">${triggered ? '⚡ Triggered: ' : '⏳ Watching: '}${triggers.join(' · ')}</div>` : ''}
-          ${!triggers.length ? `<div class="na-trigger" style="color:var(--muted)">No triggers set — rule is manual</div>` : ''}
+    // Check repeat: if lastDone + repeatDays <= today, fire
+    if (rule.repeatDays && lastDone) {
+      const nextDue = new Date(new Date(lastDone).getTime() + rule.repeatDays * 86400000);
+      const nextDueStr = nextDue.toISOString().split('T')[0];
+      if (today >= nextDueStr) { triggers.push(`🔁 Repeat every ${rule.repeatDays}d (last done ${daysSince(lastDone)}d ago)`); triggered = true; }
+      else triggers.push(`🔁 Next due ${nextDue.toLocaleDateString('en-US',{month:'short',day:'numeric'})}`);
+    } else if (rule.repeatDays && !lastDone) {
+      triggers.push(`🔁 Every ${rule.repeatDays} days — not yet logged`);
+    }
+    if (rule.byDate && today >= rule.byDate) { triggers.push(`📅 Due by ${rule.byDate}`); triggered = true; }
+    else if (rule.byDate) triggers.push(`📅 By ${rule.byDate}`);
+    if (rule.ifChlorine != null && !isNaN(lastCl) && lastCl <= rule.ifChlorine) { triggers.push(`💧 Cl ${lastCl} ppm ≤ ${rule.ifChlorine}`); triggered = true; }
+    else if (rule.ifChlorine != null) triggers.push(`💧 If Cl ≤ ${rule.ifChlorine} ppm`);
+    if (rule.ifRain != null && rain24h >= rule.ifRain) { triggers.push(`🌧️ Rain ${rain24h}" ≥ ${rule.ifRain}"`); triggered = true; }
+    else if (rule.ifRain != null) triggers.push(`🌧️ If rain ≥ ${rule.ifRain}"`);
+
+    return `<div class="rule-card ${triggered ? 'triggered' : ''}">
+      <div class="rule-header">
+        <div class="rule-dot ${triggered ? 'triggered' : ''}"></div>
+        <div class="rule-body">
+          <div class="rule-action">${rule.action}</div>
+          <div class="rule-triggers">${triggers.join(' · ')}</div>
+          ${lastDone ? `<div class="rule-lastdone">✓ Last done ${daysSince(lastDone) === 0 ? 'today' : daysSince(lastDone) + 'd ago'}</div>` : ''}
+          ${triggered ? `<div class="rule-triggered-msg">⚡ Action needed</div>` : ''}
         </div>
-        <button class="icon-btn" data-delete-rule="${i}" title="Remove">✕</button>
+        <button class="icon-btn" data-delete-rule="${i}">✕</button>
       </div>
     </div>`;
-  }).join('') : `<p class="muted">No rules yet. Add one below — for example: "Shock the pool" if chlorine drops below 2 or if it rains more than 0.5 inches.</p>`;
+  }).join('') : `<p class="muted" style="margin-bottom:12px">No rules yet. Add one below or pick a preset.</p>`;
+
+  const presetsHtml = availablePresets.length ? `
+    <div class="preset-section">
+      <div class="preset-label">Quick add</div>
+      <div class="preset-chips">
+        ${availablePresets.map((p,i) => `<button class="preset-chip" data-preset="${i}">＋ ${p.label}</button>`).join('')}
+      </div>
+    </div>` : '';
 
   return `
-    <div class="section-label">Next action rules</div>
-    ${ruleHtml}
-    <button class="add-rule-btn" id="add-rule-btn">＋ Add rule</button>
+    ${rulesHtml}
+    ${presetsHtml}
+    <button class="add-rule-btn" id="add-rule-btn">＋ Add custom rule</button>
   `;
 }
 
-function renderHistory(history) {
-  if (!history.length) return `<p class="muted">No readings yet. Log your first test on the Log Test tab.</p>`;
-  return history.map((entry, idx) => {
-    const chips = FIELDS.filter(k => entry[k] !== '' && entry[k] !== undefined).map(k => {
+// HISTORY TAB
+function renderHistory() {
+  if (!state.log.length) return `<p class="muted">Nothing logged yet. Start on the Log tab.</p>`;
+  return state.log.map((entry, idx) => {
+    const isAction = entry.type === 'action';
+    if (isAction) {
+      return `<div class="history-card action-entry">
+        <div class="history-header">
+          <span class="history-time">${fmtDate(entry.timestamp)}</span>
+          <button class="icon-btn" data-delete="${idx}">✕</button>
+        </div>
+        <div class="history-type" style="color:var(--action-text)">⚗️ Action · ${entry.ctx || ''}</div>
+        <div class="chips">
+          <span class="chip action">${entry.actionType}</span>
+          ${entry.chemical ? `<span class="chip neutral">${entry.chemical}</span>` : ''}
+          ${entry.amountUsed ? `<span class="chip neutral">${entry.amountUsed}</span>` : ''}
+        </div>
+        ${entry.notes ? `<div class="history-notes">${entry.notes}</div>` : ''}
+      </div>`;
+    }
+    const chips = FIELDS.filter(k => entry[k] !== '' && entry[k] != null).map(k => {
       const s = getStatus(k, entry[k]);
       return `<span class="chip ${s||'neutral'}">${TARGETS[k].label}: ${entry[k]}${TARGETS[k].unit}</span>`;
     }).join('');
@@ -464,25 +595,26 @@ function renderHistory(history) {
         <span class="history-time">${fmtDate(entry.timestamp)}</span>
         <button class="icon-btn" data-delete="${idx}">✕</button>
       </div>
-      ${entry.context ? `<div class="history-ctx">${entry.context}</div>` : ''}
+      <div class="history-type" style="color:var(--muted)">🧪 Test · ${entry.context || entry.ctx || ''}</div>
       <div class="chips">${chips}${visTxt}</div>
       ${entry.notes ? `<div class="history-notes">${entry.notes}</div>` : ''}
     </div>`;
   }).join('');
 }
 
-function renderInventory(inventory) {
-  const dotStyle = s => s === 'out' ? `background:var(--dot-out);border-color:var(--dot-out-b)` : s === 'low' ? `background:var(--dot-low);border-color:var(--dot-low-b)` : `background:var(--dot-ok);border-color:var(--dot-ok-b)`;
-  const rows = inventory.map((item, i) => `
+// INVENTORY TAB
+function renderInventory() {
+  const dotStyle = s => s==='out' ? 'background:var(--dot-out);border-color:var(--dot-out-b)' : s==='low' ? 'background:var(--dot-low);border-color:var(--dot-low-b)' : 'background:var(--dot-ok);border-color:var(--dot-ok-b)';
+  const rows = state.inventory.map((item, i) => `
     <div class="inv-row">
-      <button class="status-dot" style="${dotStyle(item.status)}" data-cycle="${i}" title="Cycle: ${item.status}"></button>
+      <button class="status-dot" style="${dotStyle(item.status)}" data-cycle="${i}"></button>
       <span class="inv-name">${item.name}</span>
-      <input class="inv-amount" type="text" value="${item.amount}" data-inv-amount="${i}" />
+      <input class="inv-amount" type="text" value="${invDisplayAmount(item)}" data-inv-amount="${i}" />
       <button class="icon-btn" data-remove-inv="${i}">✕</button>
     </div>`).join('');
   return `
     <div class="section-label" style="margin-bottom:4px">Chemical inventory</div>
-    <p class="muted" style="margin-bottom:10px;font-size:12px">Tap dot to cycle: <span style="color:var(--dot-ok)">●</span> ok · <span style="color:var(--dot-low)">●</span> low · <span style="color:var(--dot-out)">●</span> out</p>
+    <p class="muted" style="margin-bottom:10px;font-size:12px">Tap dot: <span style="color:var(--dot-ok)">●</span> ok · <span style="color:var(--dot-low)">●</span> low · <span style="color:var(--dot-out)">●</span> out. Amounts auto-deduct when you log an action.</p>
     <div class="card" style="padding:8px 12px">${rows}
       <div class="add-row">
         <input type="text" id="new-item-name" placeholder="New item" />
@@ -492,80 +624,68 @@ function renderInventory(inventory) {
     </div>`;
 }
 
-// ── EVENT BINDING ──────────────────────────────────────────────────────────
+// ── EVENTS ───────────────────────────────────────────────────────────────────
 function bindEvents() {
-  // field inputs
+  // Field inputs (live rec update)
   document.querySelectorAll('[data-field]').forEach(el => {
     el.addEventListener('input', e => {
       state.reading[e.target.dataset.field] = e.target.value;
-      const key = e.target.dataset.field;
-      if (FIELDS.includes(key)) {
-        const s = getStatus(key, e.target.value);
-        e.target.className = s || '';
-      }
-      // re-render recs only
-      const recsContainer = document.querySelector('.rec-card');
-      // lightweight: just rerender whole log tab
-      if (state.tab === 'log') {
-        const recs = getRecs(state.reading, state.weather);
-        const existing = document.querySelectorAll('.rec-card');
-        const label = document.querySelector('.section-label');
-        existing.forEach(el => el.remove());
-        if (label) label.remove();
-        if (recs.length) {
-          const main = document.getElementById('main');
-          const div = document.createElement('div');
-          div.innerHTML = `<div class="section-label">What to do</div>${recs.map(r=>`<div class="rec-card" style="${REC_STYLES[r.level]}">${r.text}</div>`).join('')}`;
-          main.appendChild(div);
-        }
-      }
+      if (FIELDS.includes(e.target.dataset.field)) e.target.className = getStatus(e.target.dataset.field, e.target.value) || '';
+      if (state.tab === 'log') updateRecs();
     });
   });
 
-  // save reading
+  // Save test
   const saveBtn = document.getElementById('save-btn');
   if (saveBtn) saveBtn.addEventListener('click', () => {
     const hasData = FIELDS.some(k => state.reading[k] !== '') || state.reading.visibility || state.reading.notes;
     if (!hasData) return;
-    const entry = { ...state.reading, context: state.ctx, timestamp: new Date().toISOString() };
-    state.history = [entry, ...state.history].slice(0, 300);
-    save('history', state.history);
+    state.log.unshift({ ...state.reading, type:'test', ctx: state.ctx, timestamp: new Date().toISOString() });
+    state.log = state.log.slice(0, 500);
+    save('log', state.log);
     state.reading = { chlorine:'', ph:'', alkalinity:'', cya:'', hardness:'', visibility:'', notes:'' };
     render();
     const flash = document.getElementById('saved-flash');
     if (flash) { flash.textContent = 'Saved ✓'; setTimeout(() => flash.textContent = '', 1800); }
   });
 
-  // delete history entry
+  // Open action modal
+  const oam = document.getElementById('open-action-modal');
+  if (oam) oam.addEventListener('click', openActionModal);
+
+  // Delete log entry
   document.querySelectorAll('[data-delete]').forEach(btn => {
     btn.addEventListener('click', () => {
-      state.history.splice(parseInt(btn.dataset.delete), 1);
-      save('history', state.history);
+      state.log.splice(parseInt(btn.dataset.delete), 1);
+      save('log', state.log);
       render();
     });
   });
 
-  // inventory cycle status
+  // Inventory cycle
   document.querySelectorAll('[data-cycle]').forEach(btn => {
     btn.addEventListener('click', () => {
       const i = parseInt(btn.dataset.cycle);
       const order = ['ok','low','out'];
-      const cur = order.indexOf(state.inventory[i].status);
-      state.inventory[i].status = order[(cur+1) % order.length];
+      state.inventory[i].status = order[(order.indexOf(state.inventory[i].status)+1) % order.length];
       save('inventory', state.inventory);
       render();
     });
   });
 
-  // inventory amount edit
+  // Inventory amount edit
   document.querySelectorAll('[data-inv-amount]').forEach(el => {
     el.addEventListener('change', e => {
-      state.inventory[parseInt(e.target.dataset.invAmount)].amount = e.target.value;
+      const i = parseInt(e.target.dataset.invAmount);
+      const raw = e.target.value.trim();
+      const num = parseFloat(raw);
+      state.inventory[i].amount = isNaN(num) ? '' : String(num);
+      state.inventory[i].unit   = raw.replace(/[\d.\s]/g, '').trim() || state.inventory[i].unit;
       save('inventory', state.inventory);
     });
   });
 
-  // remove inventory item
+  // Remove inventory
   document.querySelectorAll('[data-remove-inv]').forEach(btn => {
     btn.addEventListener('click', () => {
       state.inventory.splice(parseInt(btn.dataset.removeInv), 1);
@@ -574,28 +694,39 @@ function bindEvents() {
     });
   });
 
-  // add inventory item
+  // Add inventory
   const addInvBtn = document.getElementById('add-inv-btn');
   if (addInvBtn) addInvBtn.addEventListener('click', () => {
     const name = document.getElementById('new-item-name').value.trim();
     if (!name) return;
-    const amt = document.getElementById('new-item-amt').value.trim() || '—';
-    state.inventory.push({ name, amount: amt, status: 'ok' });
+    const raw = document.getElementById('new-item-amt').value.trim() || '';
+    const num = parseFloat(raw);
+    state.inventory.push({ name, amount: isNaN(num) ? '' : String(num), unit: raw.replace(/[\d.\s]/g,'').trim() || raw, status:'ok' });
     save('inventory', state.inventory);
     render();
   });
 
-  // add rule
+  // Preset rules
+  document.querySelectorAll('[data-preset]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const existingActions = state.rules.map(r => r.action);
+      const availablePresets = PRESET_RULES.filter(p => !existingActions.includes(p.action));
+      const preset = availablePresets[parseInt(btn.dataset.preset)];
+      if (!preset) return;
+      state.rules.push({ action: preset.action, byDate: null, ifChlorine: preset.ifChlorine || null, ifRain: preset.ifRain || null, repeatDays: preset.repeatDays || null });
+      save('rules', state.rules);
+      render();
+    });
+  });
+
+  // Add custom rule
   const addRuleBtn = document.getElementById('add-rule-btn');
   if (addRuleBtn) addRuleBtn.addEventListener('click', () => {
-    document.getElementById('rule-action').value = '';
-    document.getElementById('rule-date').value = '';
-    document.getElementById('rule-chlorine').value = '';
-    document.getElementById('rule-rain').value = '';
+    ['rule-action','rule-date','rule-chlorine','rule-rain','rule-repeat'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('rule-modal').style.display = 'flex';
   });
 
-  // delete rule
+  // Delete rule
   document.querySelectorAll('[data-delete-rule]').forEach(btn => {
     btn.addEventListener('click', () => {
       state.rules.splice(parseInt(btn.dataset.deleteRule), 1);
@@ -605,7 +736,91 @@ function bindEvents() {
   });
 }
 
-// ── TABS ────────────────────────────────────────────────────────────────────
+function updateRecs() {
+  const recs = getRecs(state.reading, state.weather);
+  document.querySelectorAll('.rec-card, .section-label').forEach(el => el.remove());
+  if (recs.length) {
+    const div = document.createElement('div');
+    div.style.marginTop = '14px';
+    div.innerHTML = `<div class="section-label">What to do</div>${recs.map(r=>`<div class="rec-card" style="${REC_STYLES[r.level]}">${r.text}</div>`).join('')}`;
+    document.getElementById('main').appendChild(div);
+  }
+}
+
+// ── ACTION MODAL ──────────────────────────────────────────────────────────────
+function openActionModal() {
+  state.actionType = 'Added chemical';
+  document.querySelectorAll('.atype-btn').forEach(b => b.classList.toggle('selected', b.dataset.atype === state.actionType));
+  document.getElementById('action-notes').value = '';
+  document.getElementById('action-amount').value = '';
+  document.getElementById('deduct-note').textContent = '';
+  // Populate inventory dropdown
+  const sel = document.getElementById('action-chemical');
+  sel.innerHTML = '<option value="">— select or leave blank —</option>' +
+    state.inventory.map((item, i) => `<option value="${i}">${item.name} (${invDisplayAmount(item)})</option>`).join('');
+  const chemFields = document.getElementById('chemical-fields');
+  chemFields.style.display = state.actionType === 'Added chemical' || state.actionType === 'Shocked' ? '' : 'none';
+  document.getElementById('action-modal').style.display = 'flex';
+  bindActionModal();
+}
+
+function bindActionModal() {
+  document.querySelectorAll('.atype-btn').forEach(btn => {
+    btn.onclick = () => {
+      state.actionType = btn.dataset.atype;
+      document.querySelectorAll('.atype-btn').forEach(b => b.classList.toggle('selected', b === btn));
+      const show = state.actionType === 'Added chemical' || state.actionType === 'Shocked';
+      document.getElementById('chemical-fields').style.display = show ? '' : 'none';
+    };
+  });
+
+  document.getElementById('action-chemical').onchange = updateDeductNote;
+  document.getElementById('action-amount').oninput = updateDeductNote;
+
+  document.getElementById('action-cancel').onclick = () => document.getElementById('action-modal').style.display = 'none';
+  document.getElementById('action-save').onclick = saveAction;
+}
+
+function updateDeductNote() {
+  const sel = document.getElementById('action-chemical');
+  const amt = document.getElementById('action-amount').value.trim();
+  const note = document.getElementById('deduct-note');
+  if (!sel.value || !amt) { note.textContent = ''; return; }
+  const item = state.inventory[parseInt(sel.value)];
+  const used = parseFloat(amt);
+  const cur = parseFloat(item.amount);
+  if (!isNaN(used) && !isNaN(cur)) {
+    const remaining = Math.max(0, Math.round((cur - used) * 10) / 10);
+    note.textContent = `Will deduct from inventory: ${cur} → ${remaining} ${item.unit}`;
+  } else {
+    note.textContent = 'Amount not numeric — inventory won\'t auto-deduct.';
+  }
+}
+
+function saveAction() {
+  const actionType = state.actionType;
+  const sel = document.getElementById('action-chemical');
+  const amountUsed = document.getElementById('action-amount').value.trim();
+  const notes = document.getElementById('action-notes').value.trim();
+  const invIdx = sel.value !== '' ? parseInt(sel.value) : null;
+  const chemical = invIdx !== null ? state.inventory[invIdx].name : '';
+
+  // Deduct from inventory
+  if (invIdx !== null && amountUsed) deductInventory(invIdx, amountUsed);
+
+  state.log.unshift({ type:'action', actionType, chemical, amountUsed, notes, ctx: state.ctx, timestamp: new Date().toISOString() });
+  state.log = state.log.slice(0, 500);
+  save('log', state.log);
+  save('inventory', state.inventory);
+
+  document.getElementById('action-modal').style.display = 'none';
+  // Flash confirmation
+  state.tab = 'history';
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === 'history'));
+  render();
+}
+
+// ── TABS & CONTEXT ────────────────────────────────────────────────────────────
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -615,7 +830,6 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
   });
 });
 
-// ── CONTEXT ─────────────────────────────────────────────────────────────────
 document.querySelectorAll('.ctx-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.ctx-btn').forEach(b => b.classList.remove('active'));
@@ -625,24 +839,22 @@ document.querySelectorAll('.ctx-btn').forEach(btn => {
   });
 });
 
-// ── MODAL ────────────────────────────────────────────────────────────────────
-document.getElementById('rule-cancel').addEventListener('click', () => {
-  document.getElementById('rule-modal').style.display = 'none';
-});
+// ── RULE MODAL ────────────────────────────────────────────────────────────────
+document.getElementById('rule-cancel').addEventListener('click', () => document.getElementById('rule-modal').style.display = 'none');
 document.getElementById('rule-save').addEventListener('click', () => {
   const action = document.getElementById('rule-action').value.trim();
   if (!action) return;
-  const rule = {
+  state.rules.push({
     action,
-    byDate:      document.getElementById('rule-date').value || null,
-    ifChlorine:  parseFloat(document.getElementById('rule-chlorine').value) || null,
-    ifRain:      parseFloat(document.getElementById('rule-rain').value) || null,
-  };
-  state.rules.push(rule);
+    byDate:     document.getElementById('rule-date').value || null,
+    ifChlorine: parseFloat(document.getElementById('rule-chlorine').value) || null,
+    ifRain:     parseFloat(document.getElementById('rule-rain').value) || null,
+    repeatDays: parseInt(document.getElementById('rule-repeat').value) || null,
+  });
   save('rules', state.rules);
   document.getElementById('rule-modal').style.display = 'none';
-  state.tab = 'actions';
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === 'actions'));
+  state.tab = 'nextup';
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === 'nextup'));
   render();
 });
 
