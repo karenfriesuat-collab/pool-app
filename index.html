@@ -306,6 +306,8 @@ const DEFAULT_INVENTORY = [
   { name:'Filter Cleaner',            amount:'1',   unit:'container', status:'ok' },
 ];
 
+const API = '/api/log';
+
 // ── STATE ────────────────────────────────────────────────────────────────────
 let state = {
   ctx: 'maintenance', tab: 'log',
@@ -315,23 +317,58 @@ let state = {
   rules: [],
   weather: null,
   actionType: 'Added chemical',
+  syncing: false,
 };
 
-function load() {
-  try { state.log       = JSON.parse(localStorage.getItem('pool:log'))       || []; } catch(e) { state.log = []; }
-  // Migrate old 'pool:history' entries if present
-  try {
-    const old = JSON.parse(localStorage.getItem('pool:history'));
-    if (old && old.length && !state.log.length) {
-      state.log = old.map(e => ({ ...e, type: e.type || 'test' }));
-      save('log', state.log);
-    }
-  } catch(e) {}
+async function load() {
+  // Inventory + rules always from localStorage
   try { state.inventory = JSON.parse(localStorage.getItem('pool:inventory')) || DEFAULT_INVENTORY.map(x=>({...x})); } catch(e) { state.inventory = DEFAULT_INVENTORY.map(x=>({...x})); }
   try { state.rules     = JSON.parse(localStorage.getItem('pool:rules'))     || []; } catch(e) { state.rules = []; }
   if (!state.inventory.length) state.inventory = DEFAULT_INVENTORY.map(x=>({...x}));
+
+  // Log: try Notion API first, fall back to localStorage cache
+  try {
+    const cached = JSON.parse(localStorage.getItem('pool:log:cache') || '[]');
+    if (cached.length) { state.log = cached; render(); } // show cached immediately
+  } catch(e) {}
+
+  try {
+    const data = await fetch(API).then(r => r.json());
+    if (Array.isArray(data)) {
+      state.log = data;
+      localStorage.setItem('pool:log:cache', JSON.stringify(data));
+      render();
+    }
+  } catch(e) {
+    // Notion unavailable — stay on cached data
+    console.warn('Notion API unavailable, using local cache');
+  }
 }
+
+// Save inventory/rules locally; log entries go to Notion
 function save(key, data) { try { localStorage.setItem('pool:'+key, JSON.stringify(data)); } catch(e){} }
+
+async function saveLogEntry(entry) {
+  // Optimistic: add locally right away
+  state.log.unshift(entry);
+  state.log = state.log.slice(0, 500);
+  localStorage.setItem('pool:log:cache', JSON.stringify(state.log));
+  render();
+  // Sync to Notion in background
+  try {
+    const result = await fetch(API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(entry),
+    }).then(r => r.json());
+    if (result.notionId) {
+      entry.notionId = result.notionId;
+      localStorage.setItem('pool:log:cache', JSON.stringify(state.log));
+    }
+  } catch(e) {
+    console.warn('Failed to sync to Notion:', e);
+  }
+}
 
 // ── HELPERS ──────────────────────────────────────────────────────────────────
 function getStatus(key, value) {
@@ -685,14 +722,12 @@ function bindEvents() {
 
   // Save test
   const saveBtn = document.getElementById('save-btn');
-  if (saveBtn) saveBtn.addEventListener('click', () => {
+  if (saveBtn) saveBtn.addEventListener('click', async () => {
     const hasData = FIELDS.some(k => state.reading[k] !== '') || state.reading.visibility || state.reading.notes;
     if (!hasData) return;
-    state.log.unshift({ ...state.reading, type:'test', ctx: state.ctx, timestamp: new Date().toISOString() });
-    state.log = state.log.slice(0, 500);
-    save('log', state.log);
+    const entry = { ...state.reading, type:'test', ctx: state.ctx, timestamp: new Date().toISOString() };
     state.reading = { chlorine:'', ph:'', alkalinity:'', cya:'', hardness:'', visibility:'', notes:'' };
-    render();
+    await saveLogEntry(entry);
     const flash = document.getElementById('saved-flash');
     if (flash) { flash.textContent = 'Saved ✓'; setTimeout(() => flash.textContent = '', 1800); }
   });
@@ -711,26 +746,23 @@ function bindEvents() {
   if (actionChemSel) actionChemSel.addEventListener('change', updateDeductNote);
   if (actionAmtInput) actionAmtInput.addEventListener('input', updateDeductNote);
   const saveActionBtn = document.getElementById('save-action-btn');
-  if (saveActionBtn) saveActionBtn.addEventListener('click', () => {
+  if (saveActionBtn) saveActionBtn.addEventListener('click', async () => {
     const sel = document.getElementById('action-chemical');
     const amountUsed = (document.getElementById('action-amount') || {}).value?.trim() || '';
     const notes = document.getElementById('action-notes').value.trim();
     const invIdx = sel && sel.value !== '' ? parseInt(sel.value) : null;
     const chemical = invIdx !== null ? state.inventory[invIdx].name : '';
     if (invIdx !== null && amountUsed) deductInventory(invIdx, amountUsed);
-    state.log.unshift({ type:'action', actionType: state.actionType, chemical, amountUsed, notes, ctx: state.ctx, timestamp: new Date().toISOString() });
-    state.log = state.log.slice(0, 500);
-    save('log', state.log);
     save('inventory', state.inventory);
+    const entry = { type:'action', actionType: state.actionType, chemical, amountUsed, notes, ctx: state.ctx, timestamp: new Date().toISOString() };
     // Reset form fields
     if (document.getElementById('action-notes')) document.getElementById('action-notes').value = '';
     if (document.getElementById('action-amount')) document.getElementById('action-amount').value = '';
     if (sel) sel.value = '';
     if (document.getElementById('deduct-note')) document.getElementById('deduct-note').textContent = '';
+    await saveLogEntry(entry);
     const flash = document.getElementById('action-flash');
     if (flash) { flash.textContent = 'Saved ✓'; setTimeout(() => flash.textContent = '', 1800); }
-    // Update rule last-done tracking
-    save('log', state.log);
   });
 
   // Delete log entry
@@ -939,8 +971,7 @@ document.getElementById('rule-save').addEventListener('click', () => {
 });
 
 // ── INIT ─────────────────────────────────────────────────────────────────────
-load();
-render();
+load().then(() => render());
 fetchWeather();
 </script>
 </body>
