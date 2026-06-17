@@ -48,9 +48,9 @@
 
   /* TABS */
   nav { display: flex; gap: 3px; padding: 10px 12px 0; }
-  .tab-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 8px 4px; border-radius: 10px; border: 1px solid transparent; background: transparent; color: var(--muted); font-size: 12px; font-weight: 600; cursor: pointer; }
+  .tab-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 3px; padding: 7px 2px; border-radius: 10px; border: 1px solid transparent; background: transparent; color: var(--muted); font-size: 11px; font-weight: 600; cursor: pointer; }
   .tab-btn.active { background: var(--surface); color: var(--teal); border-color: var(--border); }
-  .tab-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+  .tab-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
 
   /* MAIN */
   main { padding: 12px; }
@@ -183,7 +183,11 @@
 <nav>
   <button class="tab-btn active" data-tab="log">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-    Log
+    Test
+  </button>
+  <button class="tab-btn" data-tab="addaction">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+    Add
   </button>
   <button class="tab-btn" data-tab="nextup">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
@@ -195,7 +199,7 @@
   </button>
   <button class="tab-btn" data-tab="inventory">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
-    Inventory
+    Supplies
   </button>
 </nav>
 
@@ -464,6 +468,7 @@ function render() {
     document.getElementById('last-reading-time').textContent = fmtDate(tests[0].timestamp);
   }
   if (state.tab === 'log')       main.innerHTML = renderLog();
+  if (state.tab === 'addaction') main.innerHTML = renderAddAction();
   if (state.tab === 'nextup')    main.innerHTML = renderNextUp();
   if (state.tab === 'history')   main.innerHTML = renderHistory();
   if (state.tab === 'inventory') main.innerHTML = renderInventory();
@@ -500,8 +505,51 @@ function renderLog() {
       <button class="save-btn" id="save-btn">💾 Save test</button>
       <div class="saved-flash" id="saved-flash"></div>
     </div>
-    <button class="sec-btn" id="open-action-modal">⚗️ Log an action (chemical added, shocked, cleaned…)</button>
     ${recs.length ? `<div style="margin-top:14px"><div class="section-label">What to do</div>${recs.map(r=>`<div class="rec-card" style="${REC_STYLES[r.level]}">${r.text}</div>`).join('')}</div>` : ''}
+  `;
+}
+
+// ADD ACTION TAB
+function renderAddAction() {
+  const invOptions = state.inventory.map((item, i) =>
+    `<option value="${i}">${item.name} (${invDisplayAmount(item)})</option>`
+  ).join('');
+  const actionTypes = [
+    { type:'Added chemical', icon:'⚗️' },
+    { type:'Shocked',        icon:'⚡' },
+    { type:'Cleaned filter', icon:'🔧' },
+    { type:'Backwashed',     icon:'💧' },
+    { type:'Vacuumed',       icon:'🌀' },
+    { type:'Other',          icon:'📝' },
+  ];
+  const showChem = state.actionType === 'Added chemical' || state.actionType === 'Shocked';
+  return `
+    <div class="card">
+      <div class="card-title">What did you do?</div>
+      <div class="action-type-grid" id="atype-grid">
+        ${actionTypes.map(a => `<button class="atype-btn${state.actionType === a.type ? ' selected' : ''}" data-atype="${a.type}">${a.icon} ${a.type}</button>`).join('')}
+      </div>
+      <div id="chemical-fields" style="${showChem ? '' : 'display:none'}">
+        <div class="field" style="margin-top:12px">
+          <label>Chemical (from inventory)</label>
+          <select id="action-chemical">
+            <option value="">— select or leave blank —</option>
+            ${invOptions}
+          </select>
+        </div>
+        <div class="field" style="margin-top:10px">
+          <label>Amount used</label>
+          <input type="text" id="action-amount" placeholder="e.g. 2 lbs, 1 qt" />
+          <div class="inv-deduct-note" id="deduct-note"></div>
+        </div>
+      </div>
+      <div class="field" style="margin-top:10px">
+        <label>Notes (optional)</label>
+        <textarea id="action-notes" placeholder="Any additional details…"></textarea>
+      </div>
+      <button class="save-btn" id="save-action-btn">💾 Save action</button>
+      <div class="saved-flash" id="action-flash"></div>
+    </div>
   `;
 }
 
@@ -649,9 +697,41 @@ function bindEvents() {
     if (flash) { flash.textContent = 'Saved ✓'; setTimeout(() => flash.textContent = '', 1800); }
   });
 
-  // Open action modal
-  const oam = document.getElementById('open-action-modal');
-  if (oam) oam.addEventListener('click', openActionModal);
+  // Add action tab — inline form events
+  document.querySelectorAll('#atype-grid .atype-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.actionType = btn.dataset.atype;
+      document.querySelectorAll('#atype-grid .atype-btn').forEach(b => b.classList.toggle('selected', b === btn));
+      const show = state.actionType === 'Added chemical' || state.actionType === 'Shocked';
+      document.getElementById('chemical-fields').style.display = show ? '' : 'none';
+    });
+  });
+  const actionChemSel = document.getElementById('action-chemical');
+  const actionAmtInput = document.getElementById('action-amount');
+  if (actionChemSel) actionChemSel.addEventListener('change', updateDeductNote);
+  if (actionAmtInput) actionAmtInput.addEventListener('input', updateDeductNote);
+  const saveActionBtn = document.getElementById('save-action-btn');
+  if (saveActionBtn) saveActionBtn.addEventListener('click', () => {
+    const sel = document.getElementById('action-chemical');
+    const amountUsed = (document.getElementById('action-amount') || {}).value?.trim() || '';
+    const notes = document.getElementById('action-notes').value.trim();
+    const invIdx = sel && sel.value !== '' ? parseInt(sel.value) : null;
+    const chemical = invIdx !== null ? state.inventory[invIdx].name : '';
+    if (invIdx !== null && amountUsed) deductInventory(invIdx, amountUsed);
+    state.log.unshift({ type:'action', actionType: state.actionType, chemical, amountUsed, notes, ctx: state.ctx, timestamp: new Date().toISOString() });
+    state.log = state.log.slice(0, 500);
+    save('log', state.log);
+    save('inventory', state.inventory);
+    // Reset form fields
+    if (document.getElementById('action-notes')) document.getElementById('action-notes').value = '';
+    if (document.getElementById('action-amount')) document.getElementById('action-amount').value = '';
+    if (sel) sel.value = '';
+    if (document.getElementById('deduct-note')) document.getElementById('deduct-note').textContent = '';
+    const flash = document.getElementById('action-flash');
+    if (flash) { flash.textContent = 'Saved ✓'; setTimeout(() => flash.textContent = '', 1800); }
+    // Update rule last-done tracking
+    save('log', state.log);
+  });
 
   // Delete log entry
   document.querySelectorAll('[data-delete]').forEach(btn => {
