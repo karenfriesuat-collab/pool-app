@@ -32,7 +32,7 @@
   .last-reading { font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; }
   .last-reading strong { font-weight: 600; }
 
-  /* CONTEXT STRIP — no scroll, tight, ordered: maintenance/problem/event/opening/closing */
+  /* CONTEXT STRIP */
   .context-strip { background: var(--surface); border-bottom: 1px solid var(--border); padding: 9px 12px; display: flex; flex-wrap: wrap; gap: 5px; }
   .ctx-btn { padding: 6px 11px; border-radius: 999px; border: 1.5px solid var(--border); background: transparent; color: var(--label); font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; }
   .ctx-btn.active { background: var(--teal); border-color: var(--teal); color: #fff; }
@@ -79,6 +79,22 @@
   /* RECS */
   .rec-card { border: 1px solid; border-radius: 12px; padding: 12px 14px; font-size: 13.5px; line-height: 1.45; margin-bottom: 8px; }
 
+  /* COACH CARD */
+  .coach-card { border-radius: 14px; padding: 16px 18px; margin-top: 14px; background: var(--teal); color: #fff; position: relative; }
+  .coach-label { font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.65; margin-bottom: 8px; }
+  .coach-text { font-size: 14.5px; line-height: 1.65; }
+  .coach-refresh { position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.15); border: none; border-radius: 8px; color: #fff; padding: 5px 9px; font-size: 12px; font-weight: 700; cursor: pointer; }
+  .coach-refresh:active { background: rgba(255,255,255,0.25); }
+  .coach-updating { opacity: 0.6; font-size: 11px; margin-top: 6px; }
+  .coach-spinner-inline { display: inline-block; width: 10px; height: 10px; border: 1.5px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 4px; vertical-align: middle; }
+  .coach-loading-empty { display: flex; align-items: center; gap: 10px; padding: 16px; color: var(--muted); font-size: 13px; margin-top: 12px; }
+  .coach-spinner { width: 18px; height: 18px; border: 2.5px solid var(--border); border-top-color: var(--teal); border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* LOAD LAST READINGS */
+  .load-last-btn { width: 100%; margin-bottom: 12px; background: transparent; color: var(--label); border: 1.5px solid var(--border); border-radius: 10px; padding: 9px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .load-last-btn:active { background: var(--border); }
+
   /* HISTORY */
   .history-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; }
   .history-card.action-entry { border-color: var(--action-border); background: var(--action-bg); }
@@ -100,7 +116,7 @@
   .atype-btn { padding: 10px 8px; border-radius: 10px; border: 1.5px solid var(--border); background: #fff; color: var(--label); font-size: 13px; font-weight: 600; cursor: pointer; text-align: center; }
   .atype-btn.selected { border-color: var(--teal); background: var(--teal-light); color: var(--teal); }
 
-  /* NEXT UP — scheduled tasks */
+  /* NEXT UP */
   .task-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-bottom: 10px; }
   .task-card.urgent-card { border-color: var(--urgent-border); background: var(--urgent-bg); }
   .task-card.warn-card { border-color: var(--warn-border); background: var(--warn-bg); }
@@ -116,22 +132,7 @@
   .task-last { font-size: 11.5px; color: var(--muted); }
   .task-weather { font-size: 12.5px; color: var(--urgent-text); font-weight: 700; margin-top: 4px; }
   .task-note { font-size: 12px; color: var(--muted); margin-top: 3px; font-style: italic; }
-  .task-setdate-row { display: flex; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
-  .task-setdate-row input { flex: 1; font-size: 14px; }
-  .task-setdate-save { padding: 8px 14px; border-radius: 8px; background: var(--teal); color: #fff; border: none; font-size: 13px; font-weight: 700; cursor: pointer; flex-shrink: 0; }
   .btn-setdate { border: none; background: transparent; color: var(--muted); font-size: 11.5px; font-weight: 600; cursor: pointer; padding: 2px; }
-
-  /* OLD RULES — kept for compatibility */
-  .rule-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; }
-  .rule-card.triggered { border-color: var(--urgent-border); background: var(--urgent-bg); }
-  .rule-header { display: flex; align-items: flex-start; gap: 10px; }
-  .rule-dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; background: var(--muted); }
-  .rule-dot.triggered { background: var(--urgent-text); }
-  .rule-body { flex: 1; }
-  .rule-action { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
-  .rule-triggers { font-size: 12px; color: var(--muted); line-height: 1.5; }
-  .rule-lastdone { font-size: 11.5px; color: var(--good-text); margin-top: 4px; font-weight: 600; }
-  .rule-triggered-msg { font-size: 12.5px; color: var(--urgent-text); font-weight: 700; margin-top: 4px; }
 
   /* INVENTORY */
   .inv-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); }
@@ -154,20 +155,6 @@
   select { appearance: none; }
   .inv-deduct-note { font-size: 12px; color: var(--good-text); margin-top: 4px; font-weight: 600; min-height: 16px; }
 
-  /* LOAD LAST READINGS */
-  .load-last-btn { width: 100%; margin-bottom: 12px; background: transparent; color: var(--label); border: 1.5px solid var(--border); border-radius: 10px; padding: 9px; font-size: 13px; font-weight: 600; cursor: pointer; }
-  .load-last-btn:active { background: var(--border); }
-
-  /* COACH CARD */
-  .coach-card { border-radius: 14px; padding: 16px 18px; margin-top: 14px; background: var(--teal); color: #fff; position: relative; }
-  .coach-label { font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.65; margin-bottom: 8px; }
-  .coach-text { font-size: 14.5px; line-height: 1.65; }
-  .coach-refresh { position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.15); border: none; border-radius: 8px; color: #fff; padding: 5px 9px; font-size: 12px; font-weight: 700; cursor: pointer; }
-  .coach-refresh:active { background: rgba(255,255,255,0.25); }
-  .coach-loading { display: flex; align-items: center; gap: 10px; padding: 16px; color: var(--muted); font-size: 13px; margin-top: 12px; }
-  .coach-spinner { width: 18px; height: 18px; border: 2.5px solid var(--border); border-top-color: var(--teal); border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
   @media (prefers-color-scheme: dark) {
     :root {
       --bg: #131210; --surface: #1D1B17; --border: #302C26;
@@ -178,9 +165,6 @@
       --info-bg: #091522; --info-border: #183050; --info-text: #5E8ED0;
       --action-bg: #12092A; --action-border: #2C1A50; --action-text: #8C70C0;
       --teal-light: #0D2E34;
-      --dot-ok: #5F9D78; --dot-ok-b: #7FB894;
-      --dot-low: #C49040; --dot-low-b: #E8B95C;
-      --dot-out: #B85C50; --dot-out-b: #D9776A;
     }
     input[type=number], input[type=text], input[type=date], textarea, select, .inv-amount, .atype-btn { background: #242018; color: var(--text); border-color: var(--border); }
     .modal { background: #1D1B17; }
@@ -250,33 +234,11 @@
 
 <main id="main"></main>
 
-<!-- RULE MODAL (custom rules) -->
-<div id="rule-modal" class="modal-backdrop" style="display:none">
-  <div class="modal">
-    <h3>Add Custom Rule</h3>
-    <label>Action to watch for</label>
-    <input type="text" id="rule-action" placeholder="e.g. Shock the pool" />
-    <p style="font-size:12px;color:var(--muted);margin-top:6px">Rule fires when ANY condition is met.</p>
-    <label>📅 By this date</label>
-    <input type="date" id="rule-date" />
-    <label>💧 If chlorine drops below (ppm)</label>
-    <input type="number" id="rule-chlorine" placeholder="e.g. 0.5" step="0.1" />
-    <label>🌧️ If rain exceeds (inches in 24h)</label>
-    <input type="number" id="rule-rain" placeholder="e.g. 0.5" step="0.1" />
-    <label>🔁 Repeat every (days) after action is logged</label>
-    <input type="number" id="rule-repeat" placeholder="e.g. 7 for weekly" step="1" min="1" />
-    <div class="modal-btns">
-      <button class="btn-cancel" id="rule-cancel">Cancel</button>
-      <button class="btn-save" id="rule-save">Save Rule</button>
-    </div>
-  </div>
-</div>
-
 <!-- SET DATE MODAL -->
 <div id="setdate-modal" class="modal-backdrop" style="display:none">
   <div class="modal">
     <h3 id="setdate-modal-title">Set last done date</h3>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Seeds the schedule from your history. The app will learn automatically from new logged actions.</p>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Seeds the schedule from your history. Updates automatically from new logged actions.</p>
     <label>Date last completed</label>
     <input type="date" id="setdate-modal-input" />
     <div class="modal-btns">
@@ -288,14 +250,9 @@
 
 <script>
 // ── SCHEDULED TASKS ──────────────────────────────────────────────────────────
-// Defines recurring maintenance items with frequencies and match logic.
-// lastDone is auto-detected from state.log, or can be seeded via "Set date".
 const TASKS = [
   {
-    id: 'shock',
-    label: 'Shock the pool',
-    icon: '⚡',
-    freq: 7,
+    id: 'shock', label: 'Shock the pool', icon: '⚡', freq: 11,
     match: e => e.type === 'action' && (e.actionType === 'Shocked' || e.actionType === 'Shock'),
     weatherAlert: w => w && (w.rain24h >= 1 || w.hotRun >= 3),
     weatherMsg: w => w && w.rain24h >= 1
@@ -303,41 +260,13 @@ const TASKS = [
       : `${w.hotRun} consecutive 90°F+ days — shock before heatwave hits`,
     note: 'Shock at sunset. ~2 lbs for 25k gal.',
   },
-  {
-    id: 'filter',
-    label: 'Clean filter',
-    icon: '🔧',
-    freq: 14,
-    match: e => e.type === 'action' && e.actionType === 'Filter cleaned',
-    note: null,
-  },
-  {
-    id: 'pumpfilter',
-    label: 'Clean pump filter',
-    icon: '💧',
-    freq: 14,
-    match: e => e.type === 'action' && e.actionType === 'Pump filter cleaned',
-    note: null,
-  },
-  {
-    id: 'frog',
-    label: 'Replace Frog chlorine',
-    icon: '🐸',
-    freq: 30,
-    match: e => e.type === 'action' && e.actionType === 'Frog chlorine',
-    note: 'Check mineral level indicator.',
-  },
-  {
-    id: 'vacuum',
-    label: 'Vacuum pool',
-    icon: '🌀',
-    freq: 7,
-    match: e => e.type === 'action' && e.actionType === 'Vacuumed',
-    note: null,
-  },
+  { id: 'filter',     label: 'Clean filter',         icon: '🔧', freq: 14, match: e => e.type === 'action' && e.actionType === 'Filter cleaned',       note: null },
+  { id: 'pumpfilter', label: 'Clean pump filter',    icon: '💧', freq: 14, match: e => e.type === 'action' && e.actionType === 'Pump filter cleaned',  note: null },
+  { id: 'frog',       label: 'Replace Frog chlorine',icon: '🐸', freq: 30, match: e => e.type === 'action' && e.actionType === 'Frog chlorine',         note: 'Check mineral level indicator.' },
+  { id: 'vacuum',     label: 'Vacuum pool',           icon: '🌀', freq: 7,  match: e => e.type === 'action' && e.actionType === 'Vacuumed',              note: null },
 ];
 
-// ── CONSTANTS ──────────────────────────────────────────────────────────────
+// ── CONSTANTS ────────────────────────────────────────────────────────────────
 const TARGETS = {
   chlorine:   { min: 0.5, max: 1.5, label: 'Chlorine',   unit: 'ppm' },
   ph:         { min: 7.4, max: 7.6, label: 'pH',         unit: '' },
@@ -349,10 +278,10 @@ const FIELDS = ['chlorine', 'ph', 'alkalinity', 'cya', 'hardness'];
 
 const CTX_INFO = {
   maintenance: { bg:'var(--info-bg)',   border:'var(--info-border)',   text:'var(--info-text)',   msg:'Regular maintenance. Mineral Frog target: chlorine 0.5–1.5 ppm. Log your test, check next actions, top up as needed.' },
-  opening:     { bg:'var(--good-bg)',   border:'var(--good-border)',   text:'var(--good-text)',   msg:'Pool opening. Sequence: alkalinity first → pH → CYA stabilizer (in a sock near return jet, never the skimmer) → shock last at sunset. Install fresh Mineral Frog cartridge before opening.' },
+  opening:     { bg:'var(--good-bg)',   border:'var(--good-border)',   text:'var(--good-text)',   msg:'Pool opening. Sequence: alkalinity first → pH → CYA stabilizer (in a sock near return jet) → shock last at sunset. Install fresh Mineral Frog cartridge before opening.' },
   closing:     { bg:'var(--info-bg)',   border:'var(--info-border)',   text:'var(--info-text)',   msg:'Closing. Target: chlorine 1–2 ppm, pH 7.2–7.6. Add winter algaecide and close with a final shock. Lower water below skimmer. Remove Mineral Frog cartridge for winter.' },
-  problem:     { bg:'var(--urgent-bg)', border:'var(--urgent-border)', text:'var(--urgent-text)', msg:'Problem mode. Log current readings — recommendations will guide you. Green water: check chlorine + CYA first. Cloudy: check pH + alkalinity. With Mineral Frog, also check if cartridge needs replacing.' },
-  event:       { bg:'var(--warn-bg)',   border:'var(--warn-border)',   text:'var(--warn-text)',   msg:'Event prep. Aim for chlorine 1–1.5 ppm 24h before. Shock 2 nights before if needed. Chlorine should be ≤1.5 ppm before swimming. With heavy swimmer load, retest after the event.' },
+  problem:     { bg:'var(--urgent-bg)', border:'var(--urgent-border)', text:'var(--urgent-text)', msg:'Problem mode. Log current readings. Green water: check chlorine + CYA first. Cloudy: check pH + alkalinity. Also check if Mineral Frog cartridge needs replacing.' },
+  event:       { bg:'var(--warn-bg)',   border:'var(--warn-border)',   text:'var(--warn-text)',   msg:'Event prep. Aim for chlorine 1–1.5 ppm 24h before. Shock 2 nights before if needed. Chlorine should be ≤1.5 ppm before swimming. Retest after heavy swimmer load.' },
 };
 
 const DEFAULT_INVENTORY = [
@@ -374,19 +303,16 @@ const DEFAULT_INVENTORY = [
 ];
 
 const API = '/api/log';
+const COACH_API = '/api/coach';
 
 // ── STATE ────────────────────────────────────────────────────────────────────
 let state = {
   ctx: 'maintenance', tab: 'log',
   reading: { chlorine:'', ph:'', alkalinity:'', cya:'', hardness:'', visibility:'', notes:'' },
-  log: [],
-  inventory: [],
-  rules: [],
-  weather: null,
+  log: [], inventory: [], rules: [], weather: null,
   actionType: 'Added chemical',
-  syncing: false,
   setdateTaskId: null,
-  coachNarrative: null,
+  coachNarrative: null,   // persists until a new one arrives
   coachLoading: false,
 };
 
@@ -394,6 +320,14 @@ async function load() {
   try { state.inventory = JSON.parse(localStorage.getItem('pool:inventory')) || DEFAULT_INVENTORY.map(x=>({...x})); } catch(e) { state.inventory = DEFAULT_INVENTORY.map(x=>({...x})); }
   try { state.rules     = JSON.parse(localStorage.getItem('pool:rules'))     || []; } catch(e) { state.rules = []; }
   if (!state.inventory.length) state.inventory = DEFAULT_INVENTORY.map(x=>({...x}));
+
+  // Restore coach narrative from localStorage (valid for 48 hours)
+  try {
+    const saved = JSON.parse(localStorage.getItem('pool:coach') || 'null');
+    if (saved && saved.narrative && Date.now() - saved.ts < 48 * 3600000) {
+      state.coachNarrative = saved.narrative;
+    }
+  } catch(e) {}
 
   try {
     const cached = JSON.parse(localStorage.getItem('pool:log:cache') || '[]');
@@ -407,8 +341,18 @@ async function load() {
       localStorage.setItem('pool:log:cache', JSON.stringify(data));
       render();
     }
-  } catch(e) {
-    console.warn('Notion API unavailable, using local cache');
+  } catch(e) { console.warn('Notion API unavailable, using local cache'); }
+
+  // Always show coach on load: fetch fresh if no cached narrative, or if
+  // cached narrative is older than the most recent log entry
+  const lastTest = state.log.find(e => e.type === 'test');
+  if (lastTest) {
+    try {
+      const saved = JSON.parse(localStorage.getItem('pool:coach') || 'null');
+      const coachTs = saved ? saved.ts : 0;
+      const logTs = new Date(lastTest.timestamp).getTime();
+      if (!state.coachNarrative || logTs > coachTs) fetchCoaching(lastTest);
+    } catch(e) { fetchCoaching(lastTest); }
   }
 }
 
@@ -420,18 +364,9 @@ async function saveLogEntry(entry) {
   localStorage.setItem('pool:log:cache', JSON.stringify(state.log));
   render();
   try {
-    const result = await fetch(API, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(entry),
-    }).then(r => r.json());
-    if (result.notionId) {
-      entry.notionId = result.notionId;
-      localStorage.setItem('pool:log:cache', JSON.stringify(state.log));
-    }
-  } catch(e) {
-    console.warn('Failed to sync to Notion:', e);
-  }
+    const result = await fetch(API, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(entry) }).then(r => r.json());
+    if (result.notionId) { entry.notionId = result.notionId; localStorage.setItem('pool:log:cache', JSON.stringify(state.log)); }
+  } catch(e) { console.warn('Failed to sync to Notion:', e); }
 }
 
 // ── HELPERS ──────────────────────────────────────────────────────────────────
@@ -443,52 +378,38 @@ function getStatus(key, value) {
   if (v > t.max) return 'warn';
   return 'good';
 }
-
-function fmtDate(iso) {
-  return new Date(iso).toLocaleString('en-US', { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' });
-}
-
-function fmtShort(iso) {
-  return new Date(iso).toLocaleDateString('en-US', { month:'short', day:'numeric' });
-}
-
-function daysSince(iso) {
-  return Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
-}
+function fmtDate(iso) { return new Date(iso).toLocaleString('en-US', { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' }); }
+function fmtShort(iso) { return new Date(iso).toLocaleDateString('en-US', { month:'short', day:'numeric' }); }
+function daysSince(iso) { return Math.floor((Date.now() - new Date(iso).getTime()) / 86400000); }
 
 function getRecs(r, weather) {
   const recs = [];
-  const cl = parseFloat(r.chlorine);
-  const ph = parseFloat(r.ph);
-  const alk = parseFloat(r.alkalinity);
-  const cya = parseFloat(r.cya);
-
+  const cl = parseFloat(r.chlorine), ph = parseFloat(r.ph), alk = parseFloat(r.alkalinity), cya = parseFloat(r.cya);
   if (!isNaN(cl)) {
-    if (cl <= 0)         recs.push({ level:'urgent', text:'No chlorine detected — shock tonight at sunset (2 lbs for 25k gal). Do not wait. Never shock in morning; sunlight destroys it before it works.' });
-    else if (cl < 0.5)   recs.push({ level:'urgent', text:`Chlorine critically low (${cl} ppm) — shock tonight at sunset. Mineral Frog systems need at least 0.5 ppm free chlorine to work effectively.` });
-    else if (cl < 1.0)   recs.push({ level:'warn',   text:`Chlorine low (${cl} ppm) — consider shocking at sunset to bring back to 1–1.5 ppm range.` });
-    else if (cl > 1.5)   recs.push({ level:'info',   text:`Chlorine slightly above target (${cl} ppm) — fine to swim. Skip shock, let it burn down naturally.` });
+    if (cl <= 0)       recs.push({ level:'urgent', text:'No chlorine detected — shock tonight at sunset (2 lbs for 25k gal). Never shock in morning; sunlight destroys it before it works.' });
+    else if (cl < 0.5) recs.push({ level:'urgent', text:`Chlorine critically low (${cl} ppm) — shock tonight at sunset. Mineral Frog needs at least 0.5 ppm free chlorine to work.` });
+    else if (cl < 1.0) recs.push({ level:'warn',   text:`Chlorine low (${cl} ppm) — consider shocking at sunset to bring back to 1–1.5 ppm.` });
+    else if (cl > 1.5) recs.push({ level:'info',   text:`Chlorine above target (${cl} ppm) — fine to swim. Skip shock, let it burn down.` });
   }
   if (!isNaN(ph)) {
-    if (ph < 7.4)        recs.push({ level:'warn', text:`pH low (${ph}) — add soda ash to raise toward 7.4–7.6. Retest after 1 hour with pump running.` });
-    else if (ph > 7.6)   recs.push({ level:'warn', text:`pH high (${ph}) — add pH Down (sodium bisulfate). Retest after 1 hour.` });
+    if (ph < 7.4)      recs.push({ level:'warn', text:`pH low (${ph}) — add soda ash to raise toward 7.4–7.6. Retest after 1 hour.` });
+    else if (ph > 7.6) recs.push({ level:'warn', text:`pH high (${ph}) — add pH Down. Retest after 1 hour.` });
   }
   if (!isNaN(alk)) {
-    if (alk < 80)        recs.push({ level:'info', text:'Alkalinity low — add baking soda (raises alk only) or soda ash (raises alk + pH together).' });
-    else if (alk > 120)  recs.push({ level:'info', text:'Alkalinity high — add pH Down slowly. Retest after 30 min.' });
+    if (alk < 80)      recs.push({ level:'info', text:'Alkalinity low — add baking soda or soda ash.' });
+    else if (alk > 120)recs.push({ level:'info', text:'Alkalinity high — add pH Down slowly. Retest after 30 min.' });
   }
   if (!isNaN(cya)) {
-    if (cya < 30)        recs.push({ level:'warn', text:`CYA low (${cya} ppm) — add stabilizer in a sock near the return jet, never the skimmer. Target: 40 ppm.` });
-    else if (cya > 50)   recs.push({ level:'info', text:'CYA high — hold off adding stabilizer. Partial water swap at next top-off.' });
+    if (cya < 30)      recs.push({ level:'warn', text:`CYA low (${cya} ppm) — add stabilizer in a sock near the return jet. Target: 40 ppm.` });
+    else if (cya > 50) recs.push({ level:'info', text:'CYA high — hold off adding stabilizer. Partial water swap at next top-off.' });
   }
   if (weather) {
-    if (weather.rain24h >= 1)        recs.push({ level:'warn', text:`Heavy rain (${weather.rain24h}" in 24h) — retest chlorine and likely shock tonight.` });
-    else if (weather.rain24h >= 0.5) recs.push({ level:'info', text:`Rain today (${weather.rain24h}") — check chlorine, may need to shock.` });
-    if (weather.tempF >= 90)         recs.push({ level:'info', text:`Hot day (${weather.tempF}°F) — heat accelerates chlorine loss. Check again tonight.` });
+    if (weather.rain24h >= 1)        recs.push({ level:'warn', text:`Heavy rain (${weather.rain24h}") — retest chlorine and likely shock tonight.` });
+    else if (weather.rain24h >= 0.5) recs.push({ level:'info', text:`Rain today (${weather.rain24h}") — check chlorine.` });
+    if (weather.tempF >= 90)         recs.push({ level:'info', text:`Hot day (${weather.tempF}°F) — heat burns chlorine faster. Check again tonight.` });
   }
-  if (recs.length === 0 && Object.values(r).some(v => v !== '')) {
+  if (recs.length === 0 && Object.values(r).some(v => v !== ''))
     recs.push({ level:'good', text:'All readings in range — no action needed. Mineral Frog is doing its job.' });
-  }
   return recs;
 }
 
@@ -501,14 +422,13 @@ const REC_STYLES = {
 
 function invDisplayAmount(item) {
   if (!item.amount && !item.unit) return '—';
-  if (item.unit === 'partial' || item.unit === 'container' || item.unit === 'x') return `${item.amount || ''} ${item.unit}`.trim();
+  if (item.unit === 'partial' || item.unit === 'container' || item.unit === 'x') return `${item.amount||''} ${item.unit}`.trim();
   return item.amount ? `${item.amount} ${item.unit}` : item.unit;
 }
 
 function deductInventory(idx, amountStr) {
   const item = state.inventory[idx];
-  const used = parseFloat(amountStr);
-  const cur = parseFloat(item.amount);
+  const used = parseFloat(amountStr), cur = parseFloat(item.amount);
   if (isNaN(used) || isNaN(cur)) return null;
   const remaining = Math.max(0, Math.round((cur - used) * 10) / 10);
   item.amount = String(remaining);
@@ -525,17 +445,14 @@ async function fetchWeather() {
   navigator.geolocation.getCurrentPosition(async pos => {
     const { latitude: lat, longitude: lon } = pos.coords;
     try {
-      // Fetch current + 4-day daily max temps (for consecutive hot day detection)
       const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,precipitation&daily=temperature_2m_max,precipitation_sum&temperature_unit=fahrenheit&precipitation_unit=inch&forecast_days=4&timezone=auto`;
       const data = await fetch(url).then(r => r.json());
-      const tempF   = Math.round(data.current.temperature_2m);
+      const tempF = Math.round(data.current.temperature_2m);
       const rain24h = Math.round((data.daily.precipitation_sum?.[0] || 0) * 10) / 10;
-      // Count consecutive 90°F+ days starting from today
       const dailyTemps = data.daily.temperature_2m_max || [];
       let hotRun = 0;
       for (const t of dailyTemps) { if (t >= 90) hotRun++; else break; }
       state.weather = { tempF, rain24h, hotRun };
-
       document.getElementById('weather-inner').innerHTML = `
         <div style="display:flex;gap:5px;align-items:center"><span>🌡️</span><span class="weather-val">${tempF}°F</span></div>
         <div style="display:flex;gap:5px;align-items:center"><span>🌧️</span><span class="weather-val">${rain24h}" today</span></div>
@@ -544,8 +461,8 @@ async function fetchWeather() {
       const alerts = [];
       if (rain24h >= 1)        alerts.push({ level:'warn', text:`⚠️ ${rain24h}" rain today — retest chlorine and likely shock tonight.` });
       else if (rain24h >= 0.5) alerts.push({ level:'info', text:`🌧️ ${rain24h}" rain today — check chlorine.` });
-      if (hotRun >= 3)         alerts.push({ level:'warn', text:`☀️ ${hotRun} consecutive 90°F+ days — shock now; heat burns chlorine fast.` });
-      else if (tempF >= 90)    alerts.push({ level:'info', text:`☀️ ${tempF}°F — heat burns chlorine faster. Check again tonight.` });
+      if (hotRun >= 3)         alerts.push({ level:'warn', text:`☀️ ${hotRun} consecutive 90°F+ days — shock now.` });
+      else if (tempF >= 90)    alerts.push({ level:'info', text:`☀️ ${tempF}°F — heat burns chlorine faster. Check tonight.` });
       document.getElementById('weather-alerts').innerHTML = alerts.map(a => `<div class="weather-alert" style="${REC_STYLES[a.level]}">${a.text}</div>`).join('');
       render();
     } catch(e) {
@@ -572,21 +489,43 @@ function render() {
   bindEvents();
 }
 
-// TEST TAB — with "Load last readings" button
+// TEST TAB
 function renderLog() {
   const ci = CTX_INFO[state.ctx];
   const recs = getRecs(state.reading, state.weather);
   const hasLastTest = state.log.find(e => e.type === 'test');
   const fieldHtml = FIELDS.map(key => {
-    const t = TARGETS[key];
-    const s = getStatus(key, state.reading[key]);
+    const t = TARGETS[key], s = getStatus(key, state.reading[key]);
     return `<div class="field">
       <label>${t.label} <span class="field-range">${t.min}–${t.max}${t.unit}</span></label>
       <input type="number" inputmode="decimal" class="${s||''}" data-field="${key}" value="${state.reading[key]}" placeholder="—" />
     </div>`;
   }).join('');
+
+  // Coach card: always show at top. If loading with existing narrative, show
+  // narrative + spinner. If loading with no narrative, show spinner. If has
+  // narrative, show it. If no narrative and no log, show nothing.
+  const hasLog = state.log.length > 0;
+  let coachHtml = '';
+  if (state.coachLoading && state.coachNarrative) {
+    coachHtml = `<div class="coach-card">
+      <div class="coach-label">Coach</div>
+      <div class="coach-text">${state.coachNarrative}</div>
+      <div class="coach-updating"><span class="coach-spinner-inline"></span>Updating…</div>
+    </div>`;
+  } else if (state.coachLoading) {
+    coachHtml = `<div class="coach-loading-empty"><div class="coach-spinner"></div>Getting coaching…</div>`;
+  } else if (state.coachNarrative) {
+    coachHtml = `<div class="coach-card">
+      <div class="coach-label">Coach</div>
+      <div class="coach-text">${state.coachNarrative}</div>
+      <button class="coach-refresh" id="coach-refresh-btn">↻</button>
+    </div>`;
+  }
+
   return `
-    <div class="ctx-card" style="background:${ci.bg};border-color:${ci.border};color:${ci.text}">${ci.msg}</div>
+    ${coachHtml}
+    <div class="ctx-card" style="background:${ci.bg};border-color:${ci.border};color:${ci.text};margin-top:${coachHtml ? '14px' : '0'}">${ci.msg}</div>
     <div class="card">
       <div class="card-title">Test readings</div>
       ${hasLastTest ? `<button class="load-last-btn" id="load-last-btn">↩ Load last readings</button>` : ''}
@@ -605,28 +544,19 @@ function renderLog() {
       <div class="saved-flash" id="saved-flash"></div>
     </div>
     ${recs.length ? `<div style="margin-top:14px"><div class="section-label">What to do</div>${recs.map(r=>`<div class="rec-card" style="${REC_STYLES[r.level]}">${r.text}</div>`).join('')}</div>` : ''}
-    ${state.coachLoading ? `<div class="coach-loading"><div class="coach-spinner"></div>Getting coaching…</div>` : ''}
-    ${state.coachNarrative && !state.coachLoading ? `
-      <div class="coach-card">
-        <div class="coach-label">Coach</div>
-        <div class="coach-text">${state.coachNarrative}</div>
-        <button class="coach-refresh" id="coach-refresh-btn">↻ Ask again</button>
-      </div>` : ''}
   `;
 }
 
-// ADD ACTION TAB — updated action types + inventory bug fix for Shocked
+// ADD ACTION TAB
 function renderAddAction() {
-  const invOptions = state.inventory.map((item, i) =>
-    `<option value="${i}">${item.name} (${invDisplayAmount(item)})</option>`
-  ).join('');
+  const invOptions = state.inventory.map((item, i) => `<option value="${i}">${item.name} (${invDisplayAmount(item)})</option>`).join('');
   const actionTypes = [
-    { type:'Added chemical',    icon:'⚗️' },
-    { type:'Shocked',           icon:'⚡' },
-    { type:'Filter cleaned',    icon:'🔧' },
-    { type:'Pump filter cleaned', icon:'💧' },
-    { type:'Vacuumed',          icon:'🌀' },
-    { type:'Frog chlorine',     icon:'🐸' },
+    { type:'Added chemical',     icon:'⚗️' },
+    { type:'Shocked',            icon:'⚡' },
+    { type:'Filter cleaned',     icon:'🔧' },
+    { type:'Pump filter cleaned',icon:'💧' },
+    { type:'Vacuumed',           icon:'🌀' },
+    { type:'Frog chlorine',      icon:'🐸' },
   ];
   const showChem = state.actionType === 'Added chemical' || state.actionType === 'Shocked';
   return `
@@ -659,40 +589,24 @@ function renderAddAction() {
   `;
 }
 
-// NEXT UP TAB — scheduled tasks with real dates
+// NEXT UP TAB
 function renderNextUp() {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
+  const today = new Date(); today.setHours(0,0,0,0);
   const taskItems = TASKS.map(task => {
-    // Find last log entry matching this task type
     const lastLogEntry = state.log.find(e => task.match(e));
-    // Also check manually-seeded date in localStorage
-    const manualDate = localStorage.getItem(`pool:task:${task.id}:lastdone`);
-    let lastDoneTs = null;
-    if (lastLogEntry) {
-      lastDoneTs = new Date(lastLogEntry.timestamp);
-    } else if (manualDate) {
-      lastDoneTs = new Date(manualDate);
-    }
-
+    const manualDate   = localStorage.getItem(`pool:task:${task.id}:lastdone`);
+    let lastDoneTs = lastLogEntry ? new Date(lastLogEntry.timestamp) : manualDate ? new Date(manualDate) : null;
     let nextDue = null, daysUntil = null;
     if (lastDoneTs) {
-      const ld = new Date(lastDoneTs);
-      ld.setHours(0, 0, 0, 0);
+      const ld = new Date(lastDoneTs); ld.setHours(0,0,0,0);
       nextDue = new Date(ld.getTime() + task.freq * 86400000);
       daysUntil = Math.round((nextDue.getTime() - today.getTime()) / 86400000);
     }
-
     const weatherTrig = task.weatherAlert ? task.weatherAlert(state.weather) : false;
     const overdue = daysUntil !== null && daysUntil <= 0;
     const soonDue = daysUntil !== null && daysUntil > 0 && daysUntil <= 3;
-    const seeded = !!manualDate && !lastLogEntry;
-
-    return { ...task, lastDoneTs, nextDue, daysUntil, overdue, soonDue, weatherTrig, seeded };
+    return { ...task, lastDoneTs, nextDue, daysUntil, overdue, soonDue, weatherTrig, seeded: !!manualDate && !lastLogEntry };
   });
-
-  // Sort: weather-triggered first, then overdue, then by daysUntil ASC, then unknown
   taskItems.sort((a, b) => {
     if (b.weatherTrig && !a.weatherTrig) return 1;
     if (a.weatherTrig && !b.weatherTrig) return -1;
@@ -702,39 +616,18 @@ function renderNextUp() {
     if (b.daysUntil === null && a.daysUntil !== null) return -1;
     return (a.daysUntil ?? 0) - (b.daysUntil ?? 0);
   });
-
   const cardsHtml = taskItems.map(task => {
     const isUrgent = task.overdue || task.weatherTrig;
     const cardClass = isUrgent ? 'task-card urgent-card' : task.soonDue ? 'task-card warn-card' : 'task-card';
-
     let dueText = '', dueClass = 'ok';
     if (task.nextDue) {
-      if (task.overdue) {
-        const daysLate = Math.abs(task.daysUntil);
-        dueText = `Overdue ${daysLate > 0 ? daysLate + 'd' : '— due today'}`;
-        dueClass = 'overdue';
-      } else if (task.daysUntil === 0) {
-        dueText = 'Due today';
-        dueClass = 'soon';
-      } else {
-        dueText = `Due ${fmtShort(task.nextDue.toISOString())} · ${task.daysUntil}d`;
-        dueClass = task.soonDue ? 'soon' : 'ok';
-      }
-    } else {
-      dueText = 'Never logged — tap \'Set date\' to seed from history';
-      dueClass = 'unknown';
-    }
-
-    const lastText = task.lastDoneTs
-      ? `Last: ${fmtShort(task.lastDoneTs.toISOString())} · ${daysSince(task.lastDoneTs.toISOString())}d ago${task.seeded ? ' (manual)' : ''}`
-      : '';
-
-    const weatherLine = task.weatherTrig && task.weatherMsg
-      ? `<div class="task-weather">⚡ ${task.weatherMsg(state.weather)}</div>`
-      : '';
-
+      if (task.overdue) { dueText = `Overdue ${Math.abs(task.daysUntil) > 0 ? Math.abs(task.daysUntil)+'d' : '— due today'}`; dueClass = 'overdue'; }
+      else if (task.daysUntil === 0) { dueText = 'Due today'; dueClass = 'soon'; }
+      else { dueText = `Due ${fmtShort(task.nextDue.toISOString())} · ${task.daysUntil}d`; dueClass = task.soonDue ? 'soon' : 'ok'; }
+    } else { dueText = "Never logged — tap 📅 to seed from history"; dueClass = 'unknown'; }
+    const lastText = task.lastDoneTs ? `Last: ${fmtShort(task.lastDoneTs.toISOString())} · ${daysSince(task.lastDoneTs.toISOString())}d ago${task.seeded ? ' (manual)' : ''}` : '';
+    const weatherLine = task.weatherTrig && task.weatherMsg ? `<div class="task-weather">⚡ ${task.weatherMsg(state.weather)}</div>` : '';
     const noteLine = task.note ? `<div class="task-note">${task.note}</div>` : '';
-
     return `<div class="${cardClass}">
       <div class="task-row">
         <div class="task-icon">${task.icon}</div>
@@ -742,32 +635,26 @@ function renderNextUp() {
           <div class="task-label">${task.label}</div>
           <div class="task-due ${dueClass}">${dueText}</div>
           ${lastText ? `<div class="task-last">${lastText}</div>` : ''}
-          ${weatherLine}
-          ${noteLine}
+          ${weatherLine}${noteLine}
         </div>
         <button class="btn-setdate" data-setdate="${task.id}" title="Set last done date">📅</button>
       </div>
     </div>`;
   }).join('');
-
   return `
-    <p class="muted" style="margin-bottom:10px;font-size:12px">Tap 📅 to seed a task from your Notion history. Dates update automatically once you log new actions.</p>
+    <p class="muted" style="margin-bottom:10px;font-size:12px">Tap 📅 to seed a task from your Notion history. Updates automatically as you log actions.</p>
     ${cardsHtml}
   `;
 }
 
 // HISTORY TAB
 function renderHistory() {
-  if (!state.log.length) return `<p class="muted">Nothing logged yet. Start on the Test tab.</p>`;
+  if (!state.log.length) return `<p class="muted">Nothing logged yet.</p>`;
   return state.log.map((entry, idx) => {
-    const isAction = entry.type === 'action';
-    if (isAction) {
+    if (entry.type === 'action') {
       return `<div class="history-card action-entry">
-        <div class="history-header">
-          <span class="history-time">${fmtDate(entry.timestamp)}</span>
-          <button class="icon-btn" data-delete="${idx}">✕</button>
-        </div>
-        <div class="history-type" style="color:var(--action-text)">⚗️ Action · ${entry.ctx || ''}</div>
+        <div class="history-header"><span class="history-time">${fmtDate(entry.timestamp)}</span><button class="icon-btn" data-delete="${idx}">✕</button></div>
+        <div class="history-type" style="color:var(--action-text)">⚗️ Action · ${entry.ctx||''}</div>
         <div class="chips">
           <span class="chip action">${entry.actionType}</span>
           ${entry.chemical ? `<span class="chip neutral">${entry.chemical}</span>` : ''}
@@ -780,14 +667,10 @@ function renderHistory() {
       const s = getStatus(k, entry[k]);
       return `<span class="chip ${s||'neutral'}">${TARGETS[k].label}: ${entry[k]}${TARGETS[k].unit}</span>`;
     }).join('');
-    const visTxt = entry.visibility ? `<span class="chip neutral">👁 ${entry.visibility}</span>` : '';
     return `<div class="history-card">
-      <div class="history-header">
-        <span class="history-time">${fmtDate(entry.timestamp)}</span>
-        <button class="icon-btn" data-delete="${idx}">✕</button>
-      </div>
-      <div class="history-type" style="color:var(--muted)">🧪 Test · ${entry.context || entry.ctx || ''}</div>
-      <div class="chips">${chips}${visTxt}</div>
+      <div class="history-header"><span class="history-time">${fmtDate(entry.timestamp)}</span><button class="icon-btn" data-delete="${idx}">✕</button></div>
+      <div class="history-type" style="color:var(--muted)">🧪 Test · ${entry.context||entry.ctx||''}</div>
+      <div class="chips">${chips}${entry.visibility ? `<span class="chip neutral">👁 ${entry.visibility}</span>` : ''}</div>
       ${entry.notes ? `<div class="history-notes">${entry.notes}</div>` : ''}
     </div>`;
   }).join('');
@@ -817,7 +700,6 @@ function renderInventory() {
 
 // ── EVENTS ───────────────────────────────────────────────────────────────────
 function bindEvents() {
-  // Field inputs
   document.querySelectorAll('[data-field]').forEach(el => {
     el.addEventListener('input', e => {
       state.reading[e.target.dataset.field] = e.target.value;
@@ -826,57 +708,47 @@ function bindEvents() {
     });
   });
 
-  // Load last readings button
   const loadLastBtn = document.getElementById('load-last-btn');
   if (loadLastBtn) loadLastBtn.addEventListener('click', () => {
     const lastTest = state.log.find(e => e.type === 'test');
     if (!lastTest) return;
     FIELDS.forEach(k => { state.reading[k] = lastTest[k] != null ? String(lastTest[k]) : ''; });
     state.reading.visibility = lastTest.visibility || '';
-    // Don't carry over notes — user likely wants to add fresh notes
     render();
   });
 
-  // Save test
   const saveBtn = document.getElementById('save-btn');
   if (saveBtn) saveBtn.addEventListener('click', async () => {
     const hasData = FIELDS.some(k => state.reading[k] !== '') || state.reading.visibility || state.reading.notes;
     if (!hasData) return;
     const entry = { ...state.reading, type:'test', ctx: state.ctx, timestamp: new Date().toISOString() };
-    const savedReading = { ...state.reading }; // keep a copy for coaching
+    const savedReading = { ...state.reading };
     state.reading = { chlorine:'', ph:'', alkalinity:'', cya:'', hardness:'', visibility:'', notes:'' };
     await saveLogEntry(entry);
     const flash = document.getElementById('saved-flash');
-    if (flash) { flash.textContent = 'Saved ✓'; setTimeout(() => flash.textContent = '', 1800); }
-    // Auto-fetch coaching after save
+    if (flash) { flash.textContent = 'Saved ✓'; setTimeout(() => { if (flash) flash.textContent = ''; }, 1800); }
     fetchCoaching(savedReading);
   });
 
-  // Coach refresh button
   const coachRefresh = document.getElementById('coach-refresh-btn');
   if (coachRefresh) coachRefresh.addEventListener('click', () => {
-    // Re-run with most recent test entry
     const lastTest = state.log.find(e => e.type === 'test');
     if (lastTest) fetchCoaching(lastTest);
   });
 
-  // Add action tab — action type buttons
   document.querySelectorAll('#atype-grid .atype-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       state.actionType = btn.dataset.atype;
       document.querySelectorAll('#atype-grid .atype-btn').forEach(b => b.classList.toggle('selected', b === btn));
       const show = state.actionType === 'Added chemical' || state.actionType === 'Shocked';
-      const chemFields = document.getElementById('chemical-fields');
-      if (chemFields) chemFields.style.display = show ? '' : 'none';
-
-      // BUG FIX: auto-select shock chemical when "Shocked" is picked
+      const cf = document.getElementById('chemical-fields');
+      if (cf) cf.style.display = show ? '' : 'none';
+      // Auto-select shock chemical when Shocked is picked (inventory bug fix)
       if (state.actionType === 'Shocked') {
         const sel = document.getElementById('action-chemical');
         if (sel) {
-          const shockIdx = state.inventory.findIndex(item =>
-            item.name.toLowerCase().includes('shock') || item.name.toLowerCase().includes('di-zap')
-          );
-          if (shockIdx >= 0) { sel.value = String(shockIdx); updateDeductNote(); }
+          const idx = state.inventory.findIndex(item => item.name.toLowerCase().includes('shock') || item.name.toLowerCase().includes('di-zap'));
+          if (idx >= 0) { sel.value = String(idx); updateDeductNote(); }
         }
       }
     });
@@ -890,7 +762,7 @@ function bindEvents() {
   const saveActionBtn = document.getElementById('save-action-btn');
   if (saveActionBtn) saveActionBtn.addEventListener('click', async () => {
     const sel = document.getElementById('action-chemical');
-    const amountUsed = (document.getElementById('action-amount') || {}).value?.trim() || '';
+    const amountUsed = (document.getElementById('action-amount')||{}).value?.trim() || '';
     const notes = document.getElementById('action-notes').value.trim();
     const invIdx = sel && sel.value !== '' ? parseInt(sel.value) : null;
     const chemical = invIdx !== null ? state.inventory[invIdx].name : '';
@@ -903,10 +775,9 @@ function bindEvents() {
     if (document.getElementById('deduct-note')) document.getElementById('deduct-note').textContent = '';
     await saveLogEntry(entry);
     const flash = document.getElementById('action-flash');
-    if (flash) { flash.textContent = 'Saved ✓'; setTimeout(() => flash.textContent = '', 1800); }
+    if (flash) { flash.textContent = 'Saved ✓'; setTimeout(() => { if (flash) flash.textContent = ''; }, 1800); }
   });
 
-  // Set date buttons (Next Up tab)
   document.querySelectorAll('[data-setdate]').forEach(btn => {
     btn.addEventListener('click', () => {
       const taskId = btn.dataset.setdate;
@@ -914,16 +785,12 @@ function bindEvents() {
       if (!task) return;
       state.setdateTaskId = taskId;
       document.getElementById('setdate-modal-title').textContent = `Last done: ${task.label}`;
-      // Pre-fill with existing seeded date or today
       const existing = localStorage.getItem(`pool:task:${taskId}:lastdone`);
-      document.getElementById('setdate-modal-input').value = existing
-        ? new Date(existing).toISOString().split('T')[0]
-        : new Date().toISOString().split('T')[0];
+      document.getElementById('setdate-modal-input').value = existing ? new Date(existing).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
       document.getElementById('setdate-modal').style.display = 'flex';
     });
   });
 
-  // Delete log entry
   document.querySelectorAll('[data-delete]').forEach(btn => {
     btn.addEventListener('click', () => {
       state.log.splice(parseInt(btn.dataset.delete), 1);
@@ -932,7 +799,6 @@ function bindEvents() {
     });
   });
 
-  // Inventory cycle
   document.querySelectorAll('[data-cycle]').forEach(btn => {
     btn.addEventListener('click', () => {
       const i = parseInt(btn.dataset.cycle);
@@ -943,19 +809,16 @@ function bindEvents() {
     });
   });
 
-  // Inventory amount edit
   document.querySelectorAll('[data-inv-amount]').forEach(el => {
     el.addEventListener('change', e => {
       const i = parseInt(e.target.dataset.invAmount);
-      const raw = e.target.value.trim();
-      const num = parseFloat(raw);
+      const raw = e.target.value.trim(), num = parseFloat(raw);
       state.inventory[i].amount = isNaN(num) ? '' : String(num);
       state.inventory[i].unit   = raw.replace(/[\d.\s]/g, '').trim() || state.inventory[i].unit;
       save('inventory', state.inventory);
     });
   });
 
-  // Remove inventory item
   document.querySelectorAll('[data-remove-inv]').forEach(btn => {
     btn.addEventListener('click', () => {
       state.inventory.splice(parseInt(btn.dataset.removeInv), 1);
@@ -964,7 +827,6 @@ function bindEvents() {
     });
   });
 
-  // Add inventory item
   const addInvBtn = document.getElementById('add-inv-btn');
   if (addInvBtn) addInvBtn.addEventListener('click', () => {
     const name = document.getElementById('new-item-name').value.trim();
@@ -985,13 +847,12 @@ function updateDeductNote() {
   const amt = amtEl.value.trim();
   if (!sel.value || !amt) { note.textContent = ''; return; }
   const item = state.inventory[parseInt(sel.value)];
-  const used = parseFloat(amt);
-  const cur = parseFloat(item.amount);
+  const used = parseFloat(amt), cur = parseFloat(item.amount);
   if (!isNaN(used) && !isNaN(cur)) {
     const remaining = Math.max(0, Math.round((cur - used) * 10) / 10);
     note.textContent = `Will deduct: ${cur} → ${remaining} ${item.unit}`;
   } else {
-    note.textContent = 'Non-numeric amount — inventory won\'t auto-deduct.';
+    note.textContent = "Non-numeric amount — inventory won't auto-deduct.";
   }
 }
 
@@ -1004,6 +865,30 @@ function updateRecs() {
     div.innerHTML = `<div class="section-label">What to do</div>${recs.map(r=>`<div class="rec-card" style="${REC_STYLES[r.level]}">${r.text}</div>`).join('')}`;
     document.getElementById('main').appendChild(div);
   }
+}
+
+// ── COACHING ──────────────────────────────────────────────────────────────────
+async function fetchCoaching(reading) {
+  // Keep old narrative visible while fetching — don't clear it
+  state.coachLoading = true;
+  render();
+  try {
+    const result = await fetch(COACH_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reading, history: state.log.slice(0, 10), weather: state.weather, ctx: state.ctx }),
+    }).then(r => r.json());
+    if (result.narrative) {
+      state.coachNarrative = result.narrative;
+      // Persist so it survives page refresh
+      localStorage.setItem('pool:coach', JSON.stringify({ narrative: result.narrative, ts: Date.now() }));
+    }
+  } catch(e) {
+    console.warn('Coach unavailable:', e);
+    // Keep showing the old narrative if there was one
+  }
+  state.coachLoading = false;
+  render();
 }
 
 // ── TABS & CONTEXT ────────────────────────────────────────────────────────────
@@ -1025,30 +910,8 @@ document.querySelectorAll('.ctx-btn').forEach(btn => {
   });
 });
 
-// ── RULE MODAL ────────────────────────────────────────────────────────────────
-document.getElementById('rule-cancel').addEventListener('click', () => document.getElementById('rule-modal').style.display = 'none');
-document.getElementById('rule-save').addEventListener('click', () => {
-  const action = document.getElementById('rule-action').value.trim();
-  if (!action) return;
-  state.rules.push({
-    action,
-    byDate:     document.getElementById('rule-date').value || null,
-    ifChlorine: parseFloat(document.getElementById('rule-chlorine').value) || null,
-    ifRain:     parseFloat(document.getElementById('rule-rain').value) || null,
-    repeatDays: parseInt(document.getElementById('rule-repeat').value) || null,
-  });
-  save('rules', state.rules);
-  document.getElementById('rule-modal').style.display = 'none';
-  state.tab = 'nextup';
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === 'nextup'));
-  render();
-});
-
 // ── SET DATE MODAL ────────────────────────────────────────────────────────────
-document.getElementById('setdate-cancel').addEventListener('click', () => {
-  document.getElementById('setdate-modal').style.display = 'none';
-  state.setdateTaskId = null;
-});
+document.getElementById('setdate-cancel').addEventListener('click', () => { document.getElementById('setdate-modal').style.display = 'none'; state.setdateTaskId = null; });
 document.getElementById('setdate-save').addEventListener('click', () => {
   const dateVal = document.getElementById('setdate-modal-input').value;
   if (!dateVal || !state.setdateTaskId) return;
@@ -1058,32 +921,7 @@ document.getElementById('setdate-save').addEventListener('click', () => {
   render();
 });
 
-// ── COACHING ──────────────────────────────────────────────────────────────────
-async function fetchCoaching(reading) {
-  state.coachLoading = true;
-  state.coachNarrative = null;
-  render();
-  try {
-    const result = await fetch('/api/coach', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        reading,
-        history: state.log.slice(0, 10),
-        weather: state.weather,
-        ctx: state.ctx,
-      }),
-    }).then(r => r.json());
-    state.coachNarrative = result.narrative || null;
-  } catch(e) {
-    state.coachNarrative = null;
-    console.warn('Coach unavailable:', e);
-  }
-  state.coachLoading = false;
-  render();
-}
-
-// ── INIT ─────────────────────────────────────────────────────────────────────
+// ── INIT ──────────────────────────────────────────────────────────────────────
 load().then(() => render());
 fetchWeather();
 </script>
