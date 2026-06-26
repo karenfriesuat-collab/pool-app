@@ -268,13 +268,16 @@ const TASKS = [
 
 // ── CONSTANTS ────────────────────────────────────────────────────────────────
 const TARGETS = {
-  chlorine:   { min: 0.5, max: 1.5, label: 'Chlorine',   unit: 'ppm' },
-  ph:         { min: 7.4, max: 7.6, label: 'pH',         unit: '' },
-  alkalinity: { min: 80,  max: 120, label: 'Alkalinity', unit: 'ppm' },
-  cya:        { min: 30,  max: 50,  label: 'CYA',        unit: 'ppm' },
-  hardness:   { min: 200, max: 400, label: 'Hardness',   unit: 'ppm' },
+  totalChlor:  { min: 0.5, max: 1.5, label: 'Total Chlorine',  unit: 'ppm' },
+  freeChlor:   { min: 0.5, max: 1.5, label: 'Free Chlorine',   unit: 'ppm' },
+  bromine:     { min: 0,   max: 1,   label: 'Bromine',         unit: 'ppm' },
+  alkalinity:  { min: 80,  max: 120, label: 'Alkalinity',      unit: 'ppm' },
+  cya:         { min: 30,  max: 50,  label: 'CYA',             unit: 'ppm' },
+  hardness:    { min: 200, max: 400, label: 'Hardness',        unit: 'ppm' },
+  ph:          { min: 7.4, max: 7.6, label: 'pH',              unit: '' },
+  chlorine:    { min: 0.5, max: 1.5, label: 'Chlorine',        unit: 'ppm' }, // legacy key
 };
-const FIELDS = ['chlorine', 'ph', 'alkalinity', 'cya', 'hardness'];
+const FIELDS = ['totalChlor', 'freeChlor', 'bromine', 'alkalinity', 'cya', 'hardness', 'ph'];
 
 const CTX_INFO = {
   maintenance: { bg:'var(--info-bg)',   border:'var(--info-border)',   text:'var(--info-text)',   msg:'Regular maintenance. Mineral Frog target: chlorine 0.5–1.5 ppm. Log your test, check next actions, top up as needed.' },
@@ -308,7 +311,7 @@ const COACH_API = '/api/coach';
 // ── STATE ────────────────────────────────────────────────────────────────────
 let state = {
   ctx: 'maintenance', tab: 'log',
-  reading: { chlorine:'', ph:'', alkalinity:'', cya:'', hardness:'', visibility:'', notes:'' },
+  reading: { totalChlor:'', freeChlor:'', bromine:'', alkalinity:'', cya:'', hardness:'', ph:'', visibility:'', notes:'' },
   log: [], inventory: [], rules: [], weather: null,
   actionType: 'Added chemical',
   setdateTaskId: null,
@@ -384,12 +387,19 @@ function daysSince(iso) { return Math.floor((Date.now() - new Date(iso).getTime(
 
 function getRecs(r, weather) {
   const recs = [];
-  const cl = parseFloat(r.chlorine), ph = parseFloat(r.ph), alk = parseFloat(r.alkalinity), cya = parseFloat(r.cya);
-  if (!isNaN(cl)) {
-    if (cl <= 0)       recs.push({ level:'urgent', text:'No chlorine detected — shock tonight at sunset (2 lbs for 25k gal). Never shock in morning; sunlight destroys it before it works.' });
-    else if (cl < 0.5) recs.push({ level:'urgent', text:`Chlorine critically low (${cl} ppm) — shock tonight at sunset. Mineral Frog needs at least 0.5 ppm free chlorine to work.` });
-    else if (cl < 1.0) recs.push({ level:'warn',   text:`Chlorine low (${cl} ppm) — consider shocking at sunset to bring back to 1–1.5 ppm.` });
-    else if (cl > 1.5) recs.push({ level:'info',   text:`Chlorine above target (${cl} ppm) — fine to swim. Skip shock, let it burn down.` });
+  // Support both old 'chlorine' key and new 'freeChlor' key
+  const fc = parseFloat(r.freeChlor ?? r.chlorine);
+  const tc = parseFloat(r.totalChlor);
+  const ph = parseFloat(r.ph), alk = parseFloat(r.alkalinity), cya = parseFloat(r.cya);
+  if (!isNaN(fc)) {
+    if (fc <= 0)       recs.push({ level:'urgent', text:'No free chlorine detected — shock tonight at sunset (2 lbs for 25k gal). Never shock in the morning; sunlight destroys it before it works.' });
+    else if (fc < 0.5) recs.push({ level:'urgent', text:`Free chlorine critically low (${fc} ppm) — shock tonight at sunset. Mineral Frog needs at least 0.5 ppm to work.` });
+    else if (fc < 1.0) recs.push({ level:'warn',   text:`Free chlorine low (${fc} ppm) — consider shocking at sunset to bring back to 1–1.5 ppm.` });
+    else if (fc > 1.5) recs.push({ level:'info',   text:`Free chlorine above target (${fc} ppm) — fine to swim. Skip shock, let it burn down.` });
+  }
+  if (!isNaN(fc) && !isNaN(tc)) {
+    const combined = Math.round((tc - fc) * 10) / 10;
+    if (combined > 0.5) recs.push({ level:'warn', text:`Combined chlorine high (${combined} ppm) — chloramines present. Shock tonight to break through.` });
   }
   if (!isNaN(ph)) {
     if (ph < 7.4)      recs.push({ level:'warn', text:`pH low (${ph}) — add soda ash to raise toward 7.4–7.6. Retest after 1 hour.` });
@@ -489,6 +499,39 @@ function render() {
   bindEvents();
 }
 
+// COACH CARD HELPER — always renders something when there's log data
+function buildCoachHtml() {
+  if (state.coachLoading && state.coachNarrative) {
+    return `<div class="coach-card">
+      <div class="coach-label">Coach</div>
+      <div class="coach-text">${state.coachNarrative}</div>
+      <div class="coach-updating"><span class="coach-spinner-inline"></span>Updating…</div>
+    </div>`;
+  }
+  if (state.coachLoading) {
+    return `<div class="coach-loading-empty"><div class="coach-spinner"></div>Getting coaching…</div>`;
+  }
+  if (state.coachNarrative) {
+    return `<div class="coach-card">
+      <div class="coach-label">Coach</div>
+      <div class="coach-text">${state.coachNarrative}</div>
+      <button class="coach-refresh" id="coach-refresh-btn">↻</button>
+    </div>`;
+  }
+  if (state.log.length > 0) {
+    return `<div class="coach-loading-empty"><div class="coach-spinner"></div>Getting coaching…</div>`;
+  }
+  return '';
+}
+
+function bindCoachRefresh() {
+  const btn = document.getElementById('coach-refresh-btn');
+  if (btn) btn.addEventListener('click', () => {
+    const lastTest = state.log.find(e => e.type === 'test');
+    if (lastTest) fetchCoaching(lastTest);
+  });
+}
+
 // TEST TAB
 function renderLog() {
   const ci = CTX_INFO[state.ctx];
@@ -497,35 +540,14 @@ function renderLog() {
   const fieldHtml = FIELDS.map(key => {
     const t = TARGETS[key], s = getStatus(key, state.reading[key]);
     return `<div class="field">
-      <label>${t.label} <span class="field-range">${t.min}–${t.max}${t.unit}</span></label>
+      <label>${t.label} <span class="field-range">${t.min}–${t.max}${t.unit ? ' '+t.unit : ''}</span></label>
       <input type="number" inputmode="decimal" class="${s||''}" data-field="${key}" value="${state.reading[key]}" placeholder="—" />
     </div>`;
   }).join('');
 
-  // Coach card: always show at top. If loading with existing narrative, show
-  // narrative + spinner. If loading with no narrative, show spinner. If has
-  // narrative, show it. If no narrative and no log, show nothing.
-  const hasLog = state.log.length > 0;
-  let coachHtml = '';
-  if (state.coachLoading && state.coachNarrative) {
-    coachHtml = `<div class="coach-card">
-      <div class="coach-label">Coach</div>
-      <div class="coach-text">${state.coachNarrative}</div>
-      <div class="coach-updating"><span class="coach-spinner-inline"></span>Updating…</div>
-    </div>`;
-  } else if (state.coachLoading) {
-    coachHtml = `<div class="coach-loading-empty"><div class="coach-spinner"></div>Getting coaching…</div>`;
-  } else if (state.coachNarrative) {
-    coachHtml = `<div class="coach-card">
-      <div class="coach-label">Coach</div>
-      <div class="coach-text">${state.coachNarrative}</div>
-      <button class="coach-refresh" id="coach-refresh-btn">↻</button>
-    </div>`;
-  }
-
   return `
-    ${coachHtml}
-    <div class="ctx-card" style="background:${ci.bg};border-color:${ci.border};color:${ci.text};margin-top:${coachHtml ? '14px' : '0'}">${ci.msg}</div>
+    <div id="coach-section">${buildCoachHtml()}</div>
+    <div class="ctx-card" style="background:${ci.bg};border-color:${ci.border};color:${ci.text};margin-top:14px">${ci.msg}</div>
     <div class="card">
       <div class="card-title">Test readings</div>
       ${hasLastTest ? `<button class="load-last-btn" id="load-last-btn">↩ Load last readings</button>` : ''}
@@ -663,9 +685,12 @@ function renderHistory() {
         ${entry.notes ? `<div class="history-notes">${entry.notes}</div>` : ''}
       </div>`;
     }
-    const chips = FIELDS.filter(k => entry[k] !== '' && entry[k] != null).map(k => {
+    // Support both old entries (chlorine key) and new (freeChlor/totalChlor)
+    const allKeys = [...FIELDS, 'chlorine'];
+    const chips = allKeys.filter(k => entry[k] !== '' && entry[k] != null && TARGETS[k]).map(k => {
       const s = getStatus(k, entry[k]);
-      return `<span class="chip ${s||'neutral'}">${TARGETS[k].label}: ${entry[k]}${TARGETS[k].unit}</span>`;
+      const t = TARGETS[k];
+      return `<span class="chip ${s||'neutral'}">${t.label}: ${entry[k]}${t.unit ? ' '+t.unit : ''}</span>`;
     }).join('');
     return `<div class="history-card">
       <div class="history-header"><span class="history-time">${fmtDate(entry.timestamp)}</span><button class="icon-btn" data-delete="${idx}">✕</button></div>
@@ -723,18 +748,14 @@ function bindEvents() {
     if (!hasData) return;
     const entry = { ...state.reading, type:'test', ctx: state.ctx, timestamp: new Date().toISOString() };
     const savedReading = { ...state.reading };
-    state.reading = { chlorine:'', ph:'', alkalinity:'', cya:'', hardness:'', visibility:'', notes:'' };
+    state.reading = { totalChlor:'', freeChlor:'', bromine:'', alkalinity:'', cya:'', hardness:'', ph:'', visibility:'', notes:'' };
     await saveLogEntry(entry);
     const flash = document.getElementById('saved-flash');
     if (flash) { flash.textContent = 'Saved ✓'; setTimeout(() => { if (flash) flash.textContent = ''; }, 1800); }
     fetchCoaching(savedReading);
   });
 
-  const coachRefresh = document.getElementById('coach-refresh-btn');
-  if (coachRefresh) coachRefresh.addEventListener('click', () => {
-    const lastTest = state.log.find(e => e.type === 'test');
-    if (lastTest) fetchCoaching(lastTest);
-  });
+  bindCoachRefresh();
 
   document.querySelectorAll('#atype-grid .atype-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -868,10 +889,18 @@ function updateRecs() {
 }
 
 // ── COACHING ──────────────────────────────────────────────────────────────────
+function updateCoachSection() {
+  // Update the coach card in-place without re-rendering the whole page
+  const section = document.getElementById('coach-section');
+  if (section) {
+    section.innerHTML = buildCoachHtml();
+    bindCoachRefresh();
+  }
+}
+
 async function fetchCoaching(reading) {
-  // Keep old narrative visible while fetching — don't clear it
   state.coachLoading = true;
-  render();
+  updateCoachSection(); // show spinner / "Updating…" in-place, no full render
   try {
     const result = await fetch(COACH_API, {
       method: 'POST',
@@ -880,15 +909,13 @@ async function fetchCoaching(reading) {
     }).then(r => r.json());
     if (result.narrative) {
       state.coachNarrative = result.narrative;
-      // Persist so it survives page refresh
       localStorage.setItem('pool:coach', JSON.stringify({ narrative: result.narrative, ts: Date.now() }));
     }
   } catch(e) {
     console.warn('Coach unavailable:', e);
-    // Keep showing the old narrative if there was one
   }
   state.coachLoading = false;
-  render();
+  updateCoachSection(); // show final narrative in-place
 }
 
 // ── TABS & CONTEXT ────────────────────────────────────────────────────────────
