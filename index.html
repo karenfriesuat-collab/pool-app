@@ -73,7 +73,6 @@
   input.urgent { border-color: var(--urgent-border); background: var(--urgent-bg); }
   .save-btn { margin-top: 14px; width: 100%; background: var(--teal); color: #fff; border: none; border-radius: 10px; padding: 13px; font-size: 15px; font-weight: 700; cursor: pointer; }
   .save-btn:active { opacity: 0.85; }
-  .sec-btn { margin-top: 8px; width: 100%; background: transparent; color: var(--teal); border: 1.5px solid var(--teal); border-radius: 10px; padding: 11px; font-size: 14px; font-weight: 700; cursor: pointer; }
   .saved-flash { text-align: center; color: var(--good-text); font-weight: 600; font-size: 13px; margin-top: 8px; height: 18px; }
 
   /* RECS */
@@ -281,11 +280,11 @@ const TARGETS = {
 const FIELDS = ['hardness', 'totalChlor', 'freeChlor', 'bromine', 'alkalinity', 'cya', 'ph'];
 
 const CTX_INFO = {
-  maintenance: { bg:'var(--info-bg)',   border:'var(--info-border)',   text:'var(--info-text)',   msg:'Regular maintenance. Mineral Frog target: chlorine 0.5–1.5 ppm. Log your test, check next actions, top up as needed.' },
+  maintenance: { bg:'var(--info-bg)',   border:'var(--info-border)',   text:'var(--info-text)',   msg:'Regular maintenance. Mineral Frog target: free chlorine 0.5–1.5 ppm. Log your test, check next actions, top up as needed.' },
   opening:     { bg:'var(--good-bg)',   border:'var(--good-border)',   text:'var(--good-text)',   msg:'Pool opening. Sequence: alkalinity first → pH → CYA stabilizer (in a sock near return jet) → shock last at sunset. Install fresh Mineral Frog cartridge before opening.' },
-  closing:     { bg:'var(--info-bg)',   border:'var(--info-border)',   text:'var(--info-text)',   msg:'Closing. Target: chlorine 1–2 ppm, pH 7.2–7.6. Add winter algaecide and close with a final shock. Lower water below skimmer. Remove Mineral Frog cartridge for winter.' },
-  problem:     { bg:'var(--urgent-bg)', border:'var(--urgent-border)', text:'var(--urgent-text)', msg:'Problem mode. Log current readings. Green water: check chlorine + CYA first. Cloudy: check pH + alkalinity. Also check if Mineral Frog cartridge needs replacing.' },
-  event:       { bg:'var(--warn-bg)',   border:'var(--warn-border)',   text:'var(--warn-text)',   msg:'Event prep. Aim for chlorine 1–1.5 ppm 24h before. Shock 2 nights before if needed. Chlorine should be ≤1.5 ppm before swimming. Retest after heavy swimmer load.' },
+  closing:     { bg:'var(--info-bg)',   border:'var(--info-border)',   text:'var(--info-text)',   msg:'Closing. Target: free chlorine 1–2 ppm, pH 7.2–7.6. Add winter algaecide and close with a final shock. Lower water below skimmer. Remove Mineral Frog cartridge for winter.' },
+  problem:     { bg:'var(--urgent-bg)', border:'var(--urgent-border)', text:'var(--urgent-text)', msg:'Problem mode. Log current readings. Green water: check free chlorine + CYA first. Cloudy: check pH + alkalinity. Also check if Mineral Frog cartridge needs replacing.' },
+  event:       { bg:'var(--warn-bg)',   border:'var(--warn-border)',   text:'var(--warn-text)',   msg:'Event prep. Aim for free chlorine 1–1.5 ppm 24h before. Shock 2 nights before if needed. Free chlorine should be ≤1.5 ppm before swimming. Retest after heavy swimmer load.' },
 };
 
 const DEFAULT_INVENTORY = [
@@ -313,16 +312,15 @@ const COACH_API = '/api/coach';
 let state = {
   ctx: 'maintenance', tab: 'log',
   reading: { hardness:'', totalChlor:'', freeChlor:'', bromine:'', alkalinity:'', cya:'', ph:'', visibility:'', notes:'' },
-  log: [], inventory: [], rules: [], weather: null,
+  log: [], inventory: [], weather: null,
   actionType: 'Added chemical',
   setdateTaskId: null,
-  coachNarrative: null,   // persists until a new one arrives
+  coachNarrative: null,
   coachLoading: false,
 };
 
 async function load() {
   try { state.inventory = JSON.parse(localStorage.getItem('pool:inventory')) || DEFAULT_INVENTORY.map(x=>({...x})); } catch(e) { state.inventory = DEFAULT_INVENTORY.map(x=>({...x})); }
-  try { state.rules     = JSON.parse(localStorage.getItem('pool:rules'))     || []; } catch(e) { state.rules = []; }
   if (!state.inventory.length) state.inventory = DEFAULT_INVENTORY.map(x=>({...x}));
 
   // Restore coach narrative from localStorage (valid for 48 hours)
@@ -499,6 +497,42 @@ function render() {
   bindEvents();
 }
 
+// COACH CARD — rendered into a stable #coach-section div, never triggers full re-render
+function buildCoachHtml() {
+  if (state.coachLoading && state.coachNarrative) {
+    return `<div class="coach-card">
+      <div class="coach-label">Coach</div>
+      <div class="coach-text">${state.coachNarrative}</div>
+      <div class="coach-updating"><span class="coach-spinner-inline"></span>Updating…</div>
+    </div>`;
+  }
+  if (state.coachLoading) {
+    return `<div class="coach-loading-empty"><div class="coach-spinner"></div>Getting coaching…</div>`;
+  }
+  if (state.coachNarrative) {
+    return `<div class="coach-card">
+      <div class="coach-label">Coach</div>
+      <div class="coach-text">${state.coachNarrative}</div>
+      <button class="coach-refresh" id="coach-refresh-btn">↻</button>
+    </div>`;
+  }
+  if (state.log.length > 0) {
+    return `<div class="coach-loading-empty"><div class="coach-spinner"></div>Getting coaching…</div>`;
+  }
+  return '';
+}
+
+function updateCoachSection() {
+  const el = document.getElementById('coach-section');
+  if (!el) return;
+  el.innerHTML = buildCoachHtml();
+  const btn = document.getElementById('coach-refresh-btn');
+  if (btn) btn.addEventListener('click', () => {
+    const lastTest = state.log.find(e => e.type === 'test');
+    if (lastTest) fetchCoaching(lastTest);
+  });
+}
+
 // TEST TAB
 function renderLog() {
   const ci = CTX_INFO[state.ctx];
@@ -507,35 +541,14 @@ function renderLog() {
   const fieldHtml = FIELDS.map(key => {
     const t = TARGETS[key], s = getStatus(key, state.reading[key]);
     return `<div class="field">
-      <label>${t.label} <span class="field-range">${t.min}–${t.max}${t.unit}</span></label>
+      <label>${t.label} <span class="field-range">${t.min}–${t.max}${t.unit ? ' '+t.unit : ''}</span></label>
       <input type="number" inputmode="decimal" class="${s||''}" data-field="${key}" value="${state.reading[key]}" placeholder="—" />
     </div>`;
   }).join('');
 
-  // Coach card: always show at top. If loading with existing narrative, show
-  // narrative + spinner. If loading with no narrative, show spinner. If has
-  // narrative, show it. If no narrative and no log, show nothing.
-  const hasLog = state.log.length > 0;
-  let coachHtml = '';
-  if (state.coachLoading && state.coachNarrative) {
-    coachHtml = `<div class="coach-card">
-      <div class="coach-label">Coach</div>
-      <div class="coach-text">${state.coachNarrative}</div>
-      <div class="coach-updating"><span class="coach-spinner-inline"></span>Updating…</div>
-    </div>`;
-  } else if (state.coachLoading) {
-    coachHtml = `<div class="coach-loading-empty"><div class="coach-spinner"></div>Getting coaching…</div>`;
-  } else if (state.coachNarrative) {
-    coachHtml = `<div class="coach-card">
-      <div class="coach-label">Coach</div>
-      <div class="coach-text">${state.coachNarrative}</div>
-      <button class="coach-refresh" id="coach-refresh-btn">↻</button>
-    </div>`;
-  }
-
   return `
-    ${coachHtml}
-    <div class="ctx-card" style="background:${ci.bg};border-color:${ci.border};color:${ci.text};margin-top:${coachHtml ? '14px' : '0'}">${ci.msg}</div>
+    <div id="coach-section">${buildCoachHtml()}</div>
+    <div class="ctx-card" style="background:${ci.bg};border-color:${ci.border};color:${ci.text};margin-top:14px">${ci.msg}</div>
     <div class="card">
       <div class="card-title">Test readings</div>
       ${hasLastTest ? `<button class="load-last-btn" id="load-last-btn">↩ Load last readings</button>` : ''}
@@ -747,12 +760,6 @@ function bindEvents() {
     fetchCoaching(savedReading);
   });
 
-  const coachRefresh = document.getElementById('coach-refresh-btn');
-  if (coachRefresh) coachRefresh.addEventListener('click', () => {
-    const lastTest = state.log.find(e => e.type === 'test');
-    if (lastTest) fetchCoaching(lastTest);
-  });
-
   document.querySelectorAll('#atype-grid .atype-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       state.actionType = btn.dataset.atype;
@@ -886,9 +893,8 @@ function updateRecs() {
 
 // ── COACHING ──────────────────────────────────────────────────────────────────
 async function fetchCoaching(reading) {
-  // Keep old narrative visible while fetching — don't clear it
   state.coachLoading = true;
-  render();
+  updateCoachSection(); // update in-place — never triggers a full re-render
   try {
     const result = await fetch(COACH_API, {
       method: 'POST',
@@ -897,15 +903,13 @@ async function fetchCoaching(reading) {
     }).then(r => r.json());
     if (result.narrative) {
       state.coachNarrative = result.narrative;
-      // Persist so it survives page refresh
       localStorage.setItem('pool:coach', JSON.stringify({ narrative: result.narrative, ts: Date.now() }));
     }
   } catch(e) {
     console.warn('Coach unavailable:', e);
-    // Keep showing the old narrative if there was one
   }
   state.coachLoading = false;
-  render();
+  updateCoachSection();
 }
 
 // ── TABS & CONTEXT ────────────────────────────────────────────────────────────

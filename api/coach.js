@@ -45,21 +45,27 @@ module.exports = async (req, res) => {
         return `${d}: ${parts.join(', ')}${e.notes ? ' — ' + e.notes : ''}`;
       } else {
         const vals = [];
-        if (e.chlorine != null && e.chlorine !== '') vals.push(`Cl ${e.chlorine}`);
-        if (e.ph       != null && e.ph       !== '') vals.push(`pH ${e.ph}`);
+        // Support both legacy 'chlorine' key and new freeChlor/totalChlor keys
+        const fc = e.freeChlor ?? e.chlorine;
+        if (fc != null && fc !== '')                     vals.push(`Free Cl ${fc}`);
+        if (e.totalChlor != null && e.totalChlor !== '') vals.push(`Total Cl ${e.totalChlor}`);
+        if (e.ph         != null && e.ph         !== '') vals.push(`pH ${e.ph}`);
         if (e.alkalinity != null && e.alkalinity !== '') vals.push(`Alk ${e.alkalinity}`);
-        if (e.cya      != null && e.cya      !== '') vals.push(`CYA ${e.cya}`);
+        if (e.cya        != null && e.cya        !== '') vals.push(`CYA ${e.cya}`);
+        if (e.hardness   != null && e.hardness   !== '') vals.push(`Hard ${e.hardness}`);
         return `${d}: Test — ${vals.join(', ')}${e.notes ? ' — ' + e.notes : ''}`;
       }
     });
 
     const readingLines = [];
-    if (reading.chlorine   !== '') readingLines.push(`Chlorine: ${reading.chlorine} ppm`);
-    if (reading.ph         !== '') readingLines.push(`pH: ${reading.ph}`);
-    if (reading.alkalinity !== '') readingLines.push(`Alkalinity: ${reading.alkalinity} ppm`);
-    if (reading.cya        !== '') readingLines.push(`CYA: ${reading.cya} ppm`);
-    if (reading.hardness   !== '') readingLines.push(`Hardness: ${reading.hardness} ppm`);
-    if (reading.visibility)        readingLines.push(`Visibility: ${reading.visibility}`);
+    if (reading.freeChlor  != null && reading.freeChlor  !== '') readingLines.push(`Free Chlorine: ${reading.freeChlor} ppm`);
+    if (reading.totalChlor != null && reading.totalChlor !== '') readingLines.push(`Total Chlorine: ${reading.totalChlor} ppm`);
+    if (reading.ph         != null && reading.ph         !== '') readingLines.push(`pH: ${reading.ph}`);
+    if (reading.alkalinity != null && reading.alkalinity !== '') readingLines.push(`Alkalinity: ${reading.alkalinity} ppm`);
+    if (reading.cya        != null && reading.cya        !== '') readingLines.push(`CYA: ${reading.cya} ppm`);
+    if (reading.hardness   != null && reading.hardness   !== '') readingLines.push(`Hardness: ${reading.hardness} ppm`);
+    if (reading.bromine    != null && reading.bromine    !== '') readingLines.push(`Bromine: ${reading.bromine} ppm`);
+    if (reading.visibility)                                       readingLines.push(`Visibility: ${reading.visibility}`);
 
     const weatherLine = weather
       ? `Weather: ${weather.tempF}°F, ${weather.rain24h}" rain today${weather.hotRun >= 2 ? `, ${weather.hotRun} consecutive 90°F+ days` : ''}`
