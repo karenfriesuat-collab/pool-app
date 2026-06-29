@@ -268,13 +268,17 @@ const TASKS = [
 
 // ── CONSTANTS ────────────────────────────────────────────────────────────────
 const TARGETS = {
-  chlorine:   { min: 0.5, max: 1.5, label: 'Chlorine',   unit: 'ppm' },
-  ph:         { min: 7.4, max: 7.6, label: 'pH',         unit: '' },
-  alkalinity: { min: 80,  max: 120, label: 'Alkalinity', unit: 'ppm' },
-  cya:        { min: 30,  max: 50,  label: 'CYA',        unit: 'ppm' },
-  hardness:   { min: 200, max: 400, label: 'Hardness',   unit: 'ppm' },
+  hardness:   { min: 200, max: 400, label: 'Hardness',        unit: 'ppm' },
+  totalChlor: { min: 0.5, max: 1.5, label: 'Total Chlorine',  unit: 'ppm' },
+  freeChlor:  { min: 0.5, max: 1.5, label: 'Free Chlorine',   unit: 'ppm' },
+  bromine:    { min: 0,   max: 1,   label: 'Bromine',         unit: 'ppm' },
+  alkalinity: { min: 80,  max: 120, label: 'Alkalinity',      unit: 'ppm' },
+  cya:        { min: 30,  max: 50,  label: 'CYA',             unit: 'ppm' },
+  ph:         { min: 7.4, max: 7.6, label: 'pH',              unit: '' },
+  // legacy key — kept so old history entries still render
+  chlorine:   { min: 0.5, max: 1.5, label: 'Chlorine',        unit: 'ppm' },
 };
-const FIELDS = ['chlorine', 'ph', 'alkalinity', 'cya', 'hardness'];
+const FIELDS = ['hardness', 'totalChlor', 'freeChlor', 'bromine', 'alkalinity', 'cya', 'ph'];
 
 const CTX_INFO = {
   maintenance: { bg:'var(--info-bg)',   border:'var(--info-border)',   text:'var(--info-text)',   msg:'Regular maintenance. Mineral Frog target: chlorine 0.5–1.5 ppm. Log your test, check next actions, top up as needed.' },
@@ -308,7 +312,7 @@ const COACH_API = '/api/coach';
 // ── STATE ────────────────────────────────────────────────────────────────────
 let state = {
   ctx: 'maintenance', tab: 'log',
-  reading: { chlorine:'', ph:'', alkalinity:'', cya:'', hardness:'', visibility:'', notes:'' },
+  reading: { hardness:'', totalChlor:'', freeChlor:'', bromine:'', alkalinity:'', cya:'', ph:'', visibility:'', notes:'' },
   log: [], inventory: [], rules: [], weather: null,
   actionType: 'Added chemical',
   setdateTaskId: null,
@@ -384,12 +388,18 @@ function daysSince(iso) { return Math.floor((Date.now() - new Date(iso).getTime(
 
 function getRecs(r, weather) {
   const recs = [];
-  const cl = parseFloat(r.chlorine), ph = parseFloat(r.ph), alk = parseFloat(r.alkalinity), cya = parseFloat(r.cya);
-  if (!isNaN(cl)) {
-    if (cl <= 0)       recs.push({ level:'urgent', text:'No chlorine detected — shock tonight at sunset (2 lbs for 25k gal). Never shock in morning; sunlight destroys it before it works.' });
-    else if (cl < 0.5) recs.push({ level:'urgent', text:`Chlorine critically low (${cl} ppm) — shock tonight at sunset. Mineral Frog needs at least 0.5 ppm free chlorine to work.` });
-    else if (cl < 1.0) recs.push({ level:'warn',   text:`Chlorine low (${cl} ppm) — consider shocking at sunset to bring back to 1–1.5 ppm.` });
-    else if (cl > 1.5) recs.push({ level:'info',   text:`Chlorine above target (${cl} ppm) — fine to swim. Skip shock, let it burn down.` });
+  // Support legacy 'chlorine' key and new separate keys
+  const fc = parseFloat(r.freeChlor ?? r.chlorine);
+  const tc = parseFloat(r.totalChlor);
+  const ph = parseFloat(r.ph), alk = parseFloat(r.alkalinity), cya = parseFloat(r.cya);
+  if (!isNaN(fc)) {
+    if (fc <= 0)       recs.push({ level:'urgent', text:'No free chlorine detected — shock tonight at sunset (2 lbs for 25k gal). Never shock in morning; sunlight destroys it before it works.' });
+    else if (fc < 0.5) recs.push({ level:'urgent', text:`Free chlorine critically low (${fc} ppm) — shock tonight at sunset. Mineral Frog needs at least 0.5 ppm free chlorine to work.` });
+    else if (fc < 1.0) recs.push({ level:'warn',   text:`Free chlorine low (${fc} ppm) — consider shocking at sunset to bring back to 1–1.5 ppm.` });
+    else if (fc > 1.5) recs.push({ level:'info',   text:`Free chlorine above target (${fc} ppm) — fine to swim. Skip shock, let it burn down.` });
+  }
+  if (!isNaN(fc) && !isNaN(tc) && (tc - fc) > 0.5) {
+    recs.push({ level:'warn', text:`Combined chlorine high (${Math.round((tc-fc)*10)/10} ppm) — chloramines present. Shock tonight to break through.` });
   }
   if (!isNaN(ph)) {
     if (ph < 7.4)      recs.push({ level:'warn', text:`pH low (${ph}) — add soda ash to raise toward 7.4–7.6. Retest after 1 hour.` });
@@ -663,9 +673,12 @@ function renderHistory() {
         ${entry.notes ? `<div class="history-notes">${entry.notes}</div>` : ''}
       </div>`;
     }
-    const chips = FIELDS.filter(k => entry[k] !== '' && entry[k] != null).map(k => {
+    // Show all known fields including legacy 'chlorine' key from old entries
+    const allDisplayKeys = [...FIELDS, 'chlorine'];
+    const chips = allDisplayKeys.filter(k => TARGETS[k] && entry[k] !== '' && entry[k] != null).map(k => {
       const s = getStatus(k, entry[k]);
-      return `<span class="chip ${s||'neutral'}">${TARGETS[k].label}: ${entry[k]}${TARGETS[k].unit}</span>`;
+      const t = TARGETS[k];
+      return `<span class="chip ${s||'neutral'}">${t.label}: ${entry[k]}${t.unit ? ' '+t.unit : ''}</span>`;
     }).join('');
     return `<div class="history-card">
       <div class="history-header"><span class="history-time">${fmtDate(entry.timestamp)}</span><button class="icon-btn" data-delete="${idx}">✕</button></div>
@@ -712,7 +725,11 @@ function bindEvents() {
   if (loadLastBtn) loadLastBtn.addEventListener('click', () => {
     const lastTest = state.log.find(e => e.type === 'test');
     if (!lastTest) return;
-    FIELDS.forEach(k => { state.reading[k] = lastTest[k] != null ? String(lastTest[k]) : ''; });
+    // Copy all current fields; also map legacy 'chlorine' → 'freeChlor' if present
+    FIELDS.forEach(k => { state.reading[k] = lastTest[k] != null && lastTest[k] !== '' ? String(lastTest[k]) : ''; });
+    if (!state.reading.freeChlor && lastTest.chlorine != null && lastTest.chlorine !== '') {
+      state.reading.freeChlor = String(lastTest.chlorine);
+    }
     state.reading.visibility = lastTest.visibility || '';
     render();
   });
@@ -723,7 +740,7 @@ function bindEvents() {
     if (!hasData) return;
     const entry = { ...state.reading, type:'test', ctx: state.ctx, timestamp: new Date().toISOString() };
     const savedReading = { ...state.reading };
-    state.reading = { chlorine:'', ph:'', alkalinity:'', cya:'', hardness:'', visibility:'', notes:'' };
+    state.reading = { hardness:'', totalChlor:'', freeChlor:'', bromine:'', alkalinity:'', cya:'', ph:'', visibility:'', notes:'' };
     await saveLogEntry(entry);
     const flash = document.getElementById('saved-flash');
     if (flash) { flash.textContent = 'Saved ✓'; setTimeout(() => { if (flash) flash.textContent = ''; }, 1800); }
