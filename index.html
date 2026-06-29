@@ -355,14 +355,16 @@ function getRecs(r, weather) {
   const fc = parseFloat(r.freeChlor ?? r.chlorine);
   const tc = parseFloat(r.totalChlor);
   const ph = parseFloat(r.ph), alk = parseFloat(r.alkalinity), cya = parseFloat(r.cya);
+  const combined = (!isNaN(fc) && !isNaN(tc)) ? Math.round((tc - fc) * 10) / 10 : NaN;
+  const highCombined = !isNaN(combined) && combined > 0.5;
   if (!isNaN(fc)) {
-    if (fc <= 0)       recs.push({ level:'urgent', text:'No free chlorine detected — shock tonight at sunset (2 lbs for 25k gal). Never shock in morning; sunlight destroys it before it works.' });
-    else if (fc < 0.5) recs.push({ level:'urgent', text:`Free chlorine critically low (${fc} ppm) — shock tonight at sunset. Mineral Frog needs at least 0.5 ppm free chlorine to work.` });
-    else if (fc < 1.0) recs.push({ level:'warn',   text:`Free chlorine low (${fc} ppm) — consider shocking at sunset to bring back to 1–1.5 ppm.` });
-    else if (fc > 1.5) recs.push({ level:'info',   text:`Free chlorine above target (${fc} ppm) — fine to swim. Skip shock, let it burn down.` });
+    if (fc <= 0)           recs.push({ level:'urgent', text:'No free chlorine detected — shock tonight at sunset (2 lbs for 25k gal). Never shock in morning; sunlight destroys it before it works.' });
+    else if (fc < 0.5)     recs.push({ level:'urgent', text:`Free chlorine critically low (${fc} ppm) — shock tonight at sunset. Mineral Frog needs at least 0.5 ppm free chlorine to work.` });
+    else if (fc < 1.0)     recs.push({ level:'warn',   text:`Free chlorine low (${fc} ppm) — consider shocking at sunset to bring back to 1–1.5 ppm.` });
+    else if (fc > 1.5 && !highCombined) recs.push({ level:'info', text:`Free chlorine above target (${fc} ppm) — fine to swim. Skip shock, let it burn down.` });
   }
-  if (!isNaN(fc) && !isNaN(tc) && (tc - fc) > 0.5) {
-    recs.push({ level:'warn', text:`Combined chlorine high (${Math.round((tc-fc)*10)/10} ppm) — chloramines present. Shock tonight to break through.` });
+  if (highCombined) {
+    recs.push({ level:'warn', text:`Combined chlorine high (${combined} ppm) — chloramines present. Shock tonight to break through regardless of free chlorine level.` });
   }
   if (!isNaN(ph)) {
     if (ph < 7.4)      recs.push({ level:'warn', text:`pH low (${ph}) — add soda ash to raise toward 7.4–7.6. Retest after 1 hour.` });
