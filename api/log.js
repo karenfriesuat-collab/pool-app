@@ -40,6 +40,9 @@ module.exports = async (req, res) => {
         timestamp:  p.properties.Date?.date?.start || p.created_time,
         ctx:        p.properties.Context?.select?.name || '',
         chlorine:   p.properties.Chlorine?.number ?? '',
+        freeChlor:  p.properties['Free Chlorine']?.number ?? '',
+        totalChlor: p.properties['Total Chlorine']?.number ?? '',
+        bromine:    p.properties.Bromine?.number ?? '',
         ph:         p.properties.pH?.number ?? '',
         alkalinity: p.properties.Alkalinity?.number ?? '',
         cya:        p.properties.CYA?.number ?? '',
@@ -81,7 +84,10 @@ module.exports = async (req, res) => {
           Date:    { date: { start: ts } },
         };
         if (body.ctx)        props.Context    = { select: { name: body.ctx } };
-        if (body.chlorine  !== '' && body.chlorine  != null) props.Chlorine   = { number: parseFloat(body.chlorine) };
+        if (body.chlorine   !== '' && body.chlorine   != null) props.Chlorine           = { number: parseFloat(body.chlorine) };
+        if (body.freeChlor  !== '' && body.freeChlor  != null) props['Free Chlorine']   = { number: parseFloat(body.freeChlor) };
+        if (body.totalChlor !== '' && body.totalChlor != null) props['Total Chlorine']  = { number: parseFloat(body.totalChlor) };
+        if (body.bromine    !== '' && body.bromine    != null) props.Bromine            = { number: parseFloat(body.bromine) };
         if (body.ph        !== '' && body.ph        != null) props.pH         = { number: parseFloat(body.ph) };
         if (body.alkalinity !== '' && body.alkalinity != null) props.Alkalinity = { number: parseFloat(body.alkalinity) };
         if (body.cya       !== '' && body.cya       != null) props.CYA        = { number: parseFloat(body.cya) };
